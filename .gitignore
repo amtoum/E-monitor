@@ -6,3 +6,7 @@
 application/configs/application.ini
 application/configs/config.php
 .DS_Store
+.settings/.jsdtscope
+.settings/org.eclipse.wst.jsdt.ui.superType.container
+.settings/org.eclipse.wst.jsdt.ui.superType.name
+.vscode/launch.json

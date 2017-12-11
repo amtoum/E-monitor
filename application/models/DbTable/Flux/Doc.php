@@ -115,7 +115,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     	if(substr($data['url'], 0,31)=="https://groups.diigo.com/group/" 
     		&& !strrpos($data['url'], "/content/")===false){
     			$arr = $this->_db->getConfig();
-	    		$diigo = new Flux_Diigo("","",$arr['dbname']);
+	    	//	$diigo = new Flux_Diigo("","",$arr['dbname']);
 	    		$diigo->getCompoGroupItem($data, $idMon);
     	}
     	

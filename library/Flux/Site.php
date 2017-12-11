@@ -89,13 +89,16 @@ class Flux_Site{
                                      $frontendOptions,
                                      $backendOptions); 
         
-        //vérifie la connexion extérieur
-        try {        
-	        $g = fopen("http:\\www.google.com", "r") ? true : false;
-	        $this->bConnect = true;
-        }catch (Zend_Exception $e) {
-            	$this->bConnect = false;
-        }
+		//vérifie la connexion extérieur
+		//TODO : décommenter pour le site 
+        // try {        
+		//    // $g = fopen("http:\\www.google.com", "r") ? true : false;
+		//    $g = (shell_exec("/sbin/route -n | grep -c '^0\.0\.0\.0'")) ? true : false ;
+		   
+	    //     $this->bConnect = true;
+        // }catch (Zend_Exception $e) {
+        //     	$this->bConnect = false;
+        // }
         
     
     }
