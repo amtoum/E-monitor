@@ -10,3 +10,5 @@ application/configs/config.php
 .settings/org.eclipse.wst.jsdt.ui.superType.container
 .settings/org.eclipse.wst.jsdt.ui.superType.name
 .vscode/launch.json
+.settings/org.eclipse.php.server.core.phpServersPrefs.prefs
+.settings/org.eclipse.php.debug.core.Debug_Process_Preferences.prefs

@@ -1,0 +1,5 @@
+<?php if($this->user) : ?>
+<p id="logged-in">Connecté en tant que : <?php
+echo $this->escape($this->user);?>.
+<a href="<?php echo $this->baseUrl ?>/E-monitor/auth/logout">Déconnexion</a></p>
+<?php endif; ?>

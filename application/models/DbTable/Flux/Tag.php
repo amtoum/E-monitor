@@ -211,11 +211,12 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     /***
      * Récupère toutes les entrées flux_tag avec certains critères
      * de tri, intervalles
+     * et ajoute un recid pour w2grid
      */
-    public function getAll($order=null, $limit=0, $from=0)
+    public function getRecidAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_tag" => "flux_tag") );
+        ->from( array("flux_tag" => "flux_tag"), array("recid" =>"tag_id", "tag_id", "code", "desc", "ns", "type", "niveau", "parent", "lft", "rgt", "uri")  );
                     
         if($order != null)
         {
@@ -229,6 +230,29 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray();
     }
+
+    /***
+     * Récupère toutes les entrées flux_tag avec certains critères
+     * de tri, intervalles
+     */
+    public function getAll($order=null, $limit=0, $from=0)
+    {
+        $query = $this->select()
+        ->from( array("flux_tag" => "flux_tag"));
+        
+        if($order != null)
+        {
+            $query->order($order);
+        }
+        
+        if($limit != 0)
+        {
+            $query->limit($limit, $from);
+        }
+        
+        return $this->fetchAll($query)->toArray();
+    }
+    
     
     /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
@@ -467,7 +491,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		ORDER BY t.code, temps
 		*/		
         $query = $this->select()
-        	->from( array("t" => "flux_tag"),array("tag_id", "code", "desc", "nb"=>"COUNT(*)"))                           
+        ->from( array("t" => "flux_tag"),array("tag_id",  "code", "desc", "nb"=>"COUNT(*)"))                           
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->joinInner(array('utd' => 'flux_utitagdoc'),
                 'utd.tag_id = t.tag_id',array("nbUti"=>"COUNT(DISTINCT(utd.uti_id))", "nbDoc"=>"COUNT(DISTINCT(utd.doc_id))"))

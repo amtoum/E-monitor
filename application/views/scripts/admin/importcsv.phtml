@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- merci à https://gist.github.com/nbremer/21746a9668ffdf6d8242#file-radarchart-js -->
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title><?php echo $this->titre;?></title>
+
+		<!-- CSS -->
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+		<!-- D3.js -->
+		<script type="text/javascript" src="../js/d3.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.blast.min.js"></script>
+	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		<script type="text/javascript" src="../js/jquery.awesome-cursor.min.js" ></script>
+		
+		<style>
+			body {
+				cursor: default;
+				text-align: left;
+			}
+					
+		</style>
+	
+	</head>
+    <body>
+
+    <div id="layoutPrincipal" style="width: 100%; height: 800px;"></div>
+
+    <script >
+
+    var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 0px;';
+
+    if(w2ui['layoutPrincipal'])w2ui['layoutPrincipal'].destroy();		
+            $('#layoutPrincipal').w2layout({
+                name: 'layoutPrincipal',
+                padding: 2,
+                panels: [
+                    { type: 'top', size: 70, resizable: false, style: pstyle, content: 
+                        '<h4 style="color:#000000;" >'
+                        +'<?php echo $this->titre;?>'
+                        +'</h4>'
+                        },
+                    { type: 'left', size: 200, style: pstyle, content: 'left' },
+                    { type: 'main', style: pstyle, content: 
+                    '<div id="nestedLayout" style="padding: 10px">Selectionner une catégorie dans la barre latérale</div>' }
+            ]
+        });
+    
+    function save () { console.log("***************save************"); }
+    
+    var nestedLayout ={
+            name: 'nestedLayout',
+            padding: 2,
+            panels: [
+                { type: 'top', size: 70, resizable: false, style: pstyle, content: 
+                    '<h4 style="color:#000000;" >'
+                    +'<?php echo $this->titre;?>'
+                    +'</h4>'
+                    },
+                { type: 'main', size: 200, style: pstyle, content: 'main' },
+                { type: 'bottom', style: pstyle, content: 
+                    '<div class="w2ui-page page-0">'+
+                        '	<div id="testChart"></div>'+
+                        '</div>'+
+                        '<div class="w2ui-buttons">'+
+                        '<input id="clickMe" type="button"  value="clickme" onclick="save();" />'+
+                        '   <button class="w2ui-btn" name="reset">Annuler</button>'+
+                        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+                        '</div>' }
+            ],
+            actions: {
+		        "save": function () { 
+		        	console.log("save"); 
+			    },
+		        "reset": function () { 
+                    console.log("reset");
+		        }
+            }
+    };
+    
+    
+    if(w2ui['sidebar']) w2ui['sidebar'].destroy();
+    
+    var sidebarLien ={
+        name: 'sidebar',
+        style   : 'background-color: #000000',
+        nodes: [
+            { id: 'etudiant', text: 'Etudiants'},
+            { id: 'enseignant', text: 'Enseignants'},
+            { id: 'groupe', text: 'Groupes'},
+            { id: 'formation', text: 'Formations'},
+            { id: 'controle', text: 'Contrôle'}
+        ],
+        onClick: function (event) {
+            if(w2ui['nestedLayout']) w2ui['nestedLayout'].destroy();
+            w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
+            w2ui['nestedLayout'].content('main',
+                '<form enctype="multipart/form-data" action="/file/upload" method="POST">'+
+                '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
+                'Choose a file to upload:'+
+                '<input name="uploadedfile" type="file" />'+
+                '<br />'+
+                '<input type="submit" value="Upload File" />'+
+                '</form>'
+            );
+            // switch (event.target) {
+                
+                // case 'etudiant':
+                //     w2ui['layoutPrincipal'].content('main', 
+                //                 '<div class="w2ui-page page-0">'+
+                //             '	<div id="testChart"></div>'+
+                //             '</div>'+
+                //             '<div class="w2ui-buttons">'+
+                //             '   <button class="w2ui-btn" name="reset">Annuler</button>'+
+                //             '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+                //             '</div>',
+                //     '<div style="padding: 10px">Etudiant</div>');
+                //     break;
+                // case 'enseignant':
+                //     w2ui['layoutPrincipal'].content('main', '<div style="padding: 10px">Enseignant</div>');
+                //     break;
+                // case 'groupe':
+                //     w2ui['layoutPrincipal'].content('main', '<div style="padding: 10px">Groupe</div>');
+                //     break;
+            // }
+        }
+    };
+
+    
+
+    w2ui['layoutPrincipal'].content('left', $().w2sidebar(sidebarLien));
+    // $('#nestedLayout').w2layout(nestedLayout);
+
+    </script>
+        
+    </body>
