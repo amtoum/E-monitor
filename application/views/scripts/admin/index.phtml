@@ -23,59 +23,232 @@ $(function () {
 	$('#grid').w2grid({
 	    name: 'grid',
 	    header: 'List of Names',
-// 	    show: {
-// 	        toolbar: true,
-// 	        footer: true
-// 	    },
+
 	    columns: [
-	    	{ field: 'tag_id', caption: 'tag_id'},
-	    	{ field: 'code', caption: 'code'},
-	    	{ field: 'desc', caption: 'desc'},
-	    	{ field: 'ns', caption: 'ns'},
-	    	{ field: 'type', caption: 'type'},
-	    	{ field: 'niveau', caption: 'niveau'},
-	    	{ field: 'parent', caption: 'parent'},
-	    	{ field: 'lft', caption: 'lft'},
-	    	{ field: 'rgt', caption: 'rgt'},
-	    	{ field: 'uri', caption: 'uri'},
-	    	
-// 	        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-// 	        { field: 'lname', caption: 'Last Name', size: '30%', sortable: true, resizable: true },
-// 	        { field: 'fname', caption: 'First Name', size: '30%', sortable: true, resizable: true },
-// 	        { field: 'email', caption: 'Email', size: '40%', resizable: true },
-// 	        { field: 'sdate', caption: 'Start Date', size: '120px', resizable: true },
+
+	    	{ field: 'etudid', caption: 'Etudid'},
+	    	{ field: 'nom', caption: 'Nom'},
+	    	{ field: 'prenom', caption: 'Prenom'},
+	    	{ field: 'email', caption: 'Email'},
 	    ],
-// 	    searches: [
-// 	        { field: 'lname', caption: 'Last Name', type: 'text' },
-// 	        { field: 'fname', caption: 'First Name', type: 'text' },
-// 	        { field: 'email', caption: 'Email', type: 'text' },
-// 	    ],
-// 	    sortData: [{ field: 'recid', direction: 'ASC' }],
-	    records : <?php echo $this->resJSON; ?>
-// 	    records: [
-// 	        { recid: 1, fname: 'John', lname: 'doe', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 2, fname: 'Stuart', lname: 'Motzart', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 3, fname: 'Jin', lname: 'Franson', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 4, fname: 'Susan', lname: 'Ottie', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 5, fname: 'Kelly', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 6, fname: 'Francis', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 7, fname: 'Mark', lname: 'Welldo', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 8, fname: 'Thomas', lname: 'Bahh', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 9, fname: 'Sergei', lname: 'Rachmaninov', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 20, fname: 'Jill', lname: 'Doe', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 21, fname: 'Frank', lname: 'Motzart', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 22, fname: 'Peter', lname: 'Franson', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 23, fname: 'Andrew', lname: 'Ottie', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 24, fname: 'Manny', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 25, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 26, fname: 'Doer', lname: 'Welldo', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 27, fname: 'Shashi', lname: 'bahh', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-// 	        { recid: 28, fname: 'Av', lname: 'Rachmaninov', email: 'jdoe@gmail.com', sdate: '4/3/2012' }
-// 	    ]
-	});
+	    records : [
+    {
+        "recid": "1",
+        "etudid": "EID2292",
+        "nom": "ALBIN",
+        "prenom": "Mélina",
+        "email": "melina.albin@sfr.fr"
+    },
+    {
+        "recid": "2",
+        "etudid": "EID2013",
+        "nom": "ASLANOFF",
+        "prenom": "Gabriel",
+        "email": "gabaslan@gmail.com"
+    },
+    {
+        "recid": "3",
+        "etudid": "EID2022",
+        "nom": "CANDILLE",
+        "prenom": "Ophélie",
+        "email": "ophelie.candille1@gmail.com"
+    },
+    {
+        "recid": "4",
+        "etudid": "EID2025",
+        "nom": "CASAJUS",
+        "prenom": "Gabriel",
+        "email": "gaby.casajus@gmail.com"
+    },
+    {
+        "recid": "5",
+        "etudid": "EID2028",
+        "nom": "CAZAUBON",
+        "prenom": "Laurie",
+        "email": "cazaubon.laurie@gmail.com"
+    },
+    {
+        "recid": "6",
+        "etudid": "EID2031",
+        "nom": "CHRYSSOS",
+        "prenom": "Elena",
+        "email": "el.chryssos@gmail.com"
+    },
+    {
+        "recid": "7",
+        "etudid": "EID112",
+        "nom": "CUBAYNES",
+        "prenom": "Mathilde",
+        "email": "mathilde.cubaynes@gmail.com"
+    },
+    {
+        "recid": "8",
+        "etudid": "EID2034",
+        "nom": "DONADILLE",
+        "prenom": "Manon",
+        "email": "manon.donadille@gmail.com"
+    },
+    {
+        "recid": "9",
+        "etudid": "EID2037",
+        "nom": "GNANAPIRAKASAM",
+        "prenom": "Caroline",
+        "email": "caroline.gnana@gmail.com"
+    },
+    {
+        "recid": "10",
+        "etudid": "EID2040",
+        "nom": "GODARD",
+        "prenom": "Bastien",
+        "email": "bastien.godard@orange.fr"
+    },
+    {
+        "recid": "11",
+        "etudid": "EID2043",
+        "nom": "GONZALES",
+        "prenom": "Elodie",
+        "email": "elodie34700@hotmail.fr"
+    },
+    {
+        "recid": "12",
+        "etudid": "EID2049",
+        "nom": "GUIVARCH",
+        "prenom": "Rozenn",
+        "email": "rozennguivarch@hotmail.fr"
+    },
+    {
+        "recid": "13",
+        "etudid": "EID2052",
+        "nom": "KERYHUEL",
+        "prenom": "Aëla",
+        "email": "aela.k@hotmail.fr"
+    },
+    {
+        "recid": "14",
+        "etudid": "EID142",
+        "nom": "LAFAYSSE",
+        "prenom": "Joddie",
+        "email": "lafaysse.joddie@outlook.fr"
+    },
+    {
+        "recid": "15",
+        "etudid": "EID2307",
+        "nom": "LALES",
+        "prenom": "Juliette",
+        "email": "juliette.lales12@gmail.com"
+    },
+    {
+        "recid": "16",
+        "etudid": "EID2055",
+        "nom": "LYONNET",
+        "prenom": "Elodie",
+        "email": "elodie.lyonnet@wanadoo.fr"
+    },
+    {
+        "recid": "17",
+        "etudid": "EID2058",
+        "nom": "MARAIS",
+        "prenom": "Jeanne",
+        "email": "jeanne.marais@laposte.net"
+    },
+    {
+        "recid": "18",
+        "etudid": "EID2061",
+        "nom": "MINCHELLA",
+        "prenom": "Laura",
+        "email": "laura.minchella@homail.fr"
+    },
+    {
+        "recid": "19",
+        "etudid": "EID2064",
+        "nom": "MOMPEYSSIN",
+        "prenom": "Louise",
+        "email": "louise.mompeyssin@outlook.com"
+    },
+    {
+        "recid": "20",
+        "etudid": "EID2067",
+        "nom": "PIPET",
+        "prenom": "Marylou",
+        "email": "marylou.pipet@gmail.com"
+    },
+    {
+
+        "recid": "21",
+        "etudid": "EID2070",
+        "nom": "PLASSMANN",
+        "prenom": "Marion",
+        "email": "plassmann.marion@gmail.com"
+    },
+    {
+        "recid": "22",
+        "etudid": "EID2073",
+        "nom": "PRESTWICH",
+        "prenom": "Chloë",
+        "email": "chloeprestwich@yahoo.co.uk"
+    },
+    {
+        "recid": "23",
+        "etudid": "EID2076",
+        "nom": "ROUYLOU",
+        "prenom": "Audrey",
+        "email": "audrey.rouylou@yahoo.fr"
+    },
+    {
+        "recid": "24",
+        "etudid": "EID2079",
+        "nom": "SIDICARO",
+        "prenom": "Tom",
+        "email": "tomsidicaro@gmail.com"
+    },
+    {
+        "recid": "25",
+        "etudid": "EID2082",
+        "nom": "SIROTEAU",
+        "prenom": "Florian",
+        "email": "f.siroteau@gmail.com"
+    },
+    {
+        "recid": "26",
+        "etudid": "EID2088",
+        "nom": "SOUILLIER",
+        "prenom": "Alfwold",
+        "email": "valeriefelut@free.fr"
+    },
+    {
+        "recid": "27",
+        "etudid": "EID2091",
+        "nom": "TERNOY",
+        "prenom": "Elise",
+        "email": "elise.ternoy@free.fr"
+    },
+    {
+        "recid": "28",
+        "etudid": "EID2094",
+        "nom": "TERRIER",
+        "prenom": "Lauren",
+        "email": "terrier.lauren@gmail.com"
+    },
+    {
+        "recid": "29",
+        "etudid": "EID2097",
+        "nom": "TRIBOT",
+        "prenom": "Audrey",
+        "email": "audrey@tribot.fr"
+    },
+    {
+        "recid": "30",
+        "etudid": "EID2100",
+        "nom": "WAYOLLE",
+        "prenom": "Sophie",
+        "email": "sophie78126@hotmail.fr"
+    }
+]
+});
 });
 </script>
 
+<?php echo $this->resJSON; ?>
 
 </body>
 </html>
