@@ -30,7 +30,7 @@
     <div id="layoutPrincipal" style="width: 100%; height: 800px;"></div>
 
     <script >
-
+    
     var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 0px;';
 
     if(w2ui['layoutPrincipal'])w2ui['layoutPrincipal'].destroy();		
@@ -57,11 +57,6 @@
             name: 'nestedLayout',
             padding: 2,
             panels: [
-                { type: 'top', size: 70, resizable: false, style: pstyle, content: 
-                    '<div style="color:#000000;" >'
-                    +'<?php echo $this->titre;?>'
-                    +'</div>'
-                    },
                 { type: 'main', size: 200, style: pstyle, content: '<div id="grid" style="width: 100%; height: 400px; overflow: visible;"></div>' },
                 { type: 'bottom', style: pstyle, content: 
                     '<div class="w2ui-page page-0">'+
@@ -75,6 +70,21 @@
             ]
     };
     
+    var formSaveDB = {
+		    name: 'formSaveDB',
+		    style: 'border: 0px',
+		    formHTML: 
+		        '<div class="w2ui-buttons">'+
+		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+		        '</div>',
+		    fields: [],
+		    record: {}, 
+		    actions: {
+		        "save": function () { 
+		        		saveDataToDB(); 
+			    },
+		    }
+		};
    
     if(w2ui['sidebar']) w2ui['sidebar'].destroy();
     
@@ -82,7 +92,7 @@
         name: 'sidebar',
         style   : 'background-color: #BBBB00',
         nodes: [
-            { id: 'etudiant', text: 'Etudiants',selected : true},
+            { id: 'etudiant', text: 'Etudiants'},
             { id: 'enseignant', text: 'Enseignants'},
             { id: 'groupe', text: 'Groupes'},
             { id: 'formation', text: 'Formations'},
@@ -92,8 +102,20 @@
             if(w2ui['nestedLayout']) 
                 w2ui['nestedLayout'].destroy();
             w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
+            if ('<?= ($this->resJSON)?true:false; ?>'){
+                if (w2ui['grid']){
+                w2ui['grid'].destroy();
+                } 
+                w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
+                // $('#grid').w2grid(grid);
+                if (w2ui['formSaveDB'])
+                    w2ui['formSaveDB'].destroy();
+                w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
+            } 
+            else {
             w2ui['nestedLayout'].content('bottom',
                 '<form enctype="multipart/form-data" action="upload" method="POST">'+
+                '<input type="hidden" name="selection" value="'+event.target+'"/>'+
                 '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
                 'Choose a file to upload:'+
                 '<input name="uploadedfile" type="file" />'+
@@ -101,13 +123,7 @@
                 '<input type="submit" value="Upload File" onclick="save();" />'+
                 '</form>'
             );
-            if ('<?= ($this->resJSON)?true:false; ?>'){
-                if (w2ui['grid']){
-                w2ui['grid'].destroy();
-                } 
-                w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
-                // $('#grid').w2grid(grid);
-            } 
+            }
             // switch (event.target) {
                 
                 // case 'etudiant':
@@ -145,36 +161,72 @@
             toolbarReload   : false
         }, 
 	    columns: [
-	    	{ field: 'etudid', caption: 'Etudid', size: '30%'},
 	    	{ field: 'nom', caption: 'Nom', size: '30%'},
 	    	{ field: 'prenom', caption: 'Prenom', size: '30%'},
 	    	{ field: 'email', caption: 'Email', size: '30%'},
+            { field: 'groupe', caption: 'Groupe', size: '30%'},
+            { field: 'formation', caption: 'Formation', size: '30%'},
 	    ],
 	    records : <?php if($this->resJSON) echo $this->resJSON; else echo "{}" ?>
 	};
 
-    
 
     w2ui['layoutPrincipal'].content('left', $().w2sidebar(sidebarLien));
+    if (<?php if($this->selection) echo "1"; else echo "0" ?>){
+        w2ui['sidebar'].click(<?php echo '\''.$this->selection.'\'';?>);
+        w2ui['sidebar'].select(<?php echo '\''.$this->selection.'\'';?>);
+        console.log("clicked sidebar");
+    }
 
 
-    if(w2ui['nestedLayout']) 
-                w2ui['nestedLayout'].destroy();
-            w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
-            w2ui['nestedLayout'].content('bottom',
-                '<form enctype="multipart/form-data" action="upload" method="POST">'+
-                '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
-                'Choose a file to upload:'+
-                '<input name="uploadedfile" type="file" />'+
-                '<br />'+
-                '<input type="submit" value="Upload File" onclick="save();" />'+
-                '</form>'
-            );
-            if ('<?= ($this->resJSON)?true:false; ?>'){
-                if (w2ui['grid']){
-                w2ui['grid'].destroy();
-                } 
-                w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));}
+    // if(w2ui['nestedLayout']) 
+    //             w2ui['nestedLayout'].destroy();
+    //         w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
+    //         w2ui['nestedLayout'].content('bottom',
+    //             '<form enctype="multipart/form-data" action="upload" method="POST">'+
+    //             '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
+    //             'Choose a file to upload:'+
+    //             '<input name="uploadedfile" type="file" />'+
+    //             '<br />'+
+    //             '<input type="submit" value="Upload File" onclick="save();" />'+
+    //             '</form>'
+    //         );
+    //         if ('<?= ($this->resJSON)?true:false; ?>'){
+    //             if (w2ui['grid']){
+    //             w2ui['grid'].destroy();
+    //             } 
+    //             w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));}
+
+
+
+    function saveDataToDB(){
+        console.log("will save data to db now !!");
+        if (<?php if($this->selection) echo "1"; else echo "0" ?>)
+            var dt = {'resJSON':<?=($this->resJSON)?$this->resJSON:0?>,'type':<?php echo '\''.$this->selection.'\'';?>};
+        passJSONviaAjax(dt);
+    }
+		
+    function passJSONviaAjax(dt) {
+        $.ajax({
+                url: "savejsonintodb",
+                data: dt,
+                type: 'get',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                    w2alert("Erreur : "+e+"\n dt :"+dt);
+                    }
+                },            	
+                success: function(result) {
+                    console.log(result);
+                    w2alert("Données envoyées au serveur et enregistrées avec succès");
+            }
+        });
+    }
 
     </script>
         
