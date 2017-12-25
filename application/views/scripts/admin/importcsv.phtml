@@ -134,9 +134,11 @@
                     break;
                 case 'formation':
                 case 'groupe':
-                case 'controle':
+                // case 'controle':
                     w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Partie '+
-                                                            event.target+' à remplir plus tard</div>')
+                                                            event.target+' à remplir plus tard</div>');
+                    var json = {"type" : event.target};
+                    getDataGroupeFormation(json);
                     break;
             }
         }
@@ -164,11 +166,11 @@
 
     var grid ={
 	    name: 'grid',
-	    header: 'List of Names',
+	    header: 'Liste à partir du fichier csv',
         recid: 'recid',
         show: {
             lineNumbers     : true,
-            footer          : true,
+            footer          : false,
             header          : true,
             toolbar         : false,
             toolbarColumns  : false,
@@ -185,6 +187,7 @@
 	    records : <?php if($this->resJSON) echo $this->resJSON; else echo "{}" ?>
 	};
 
+    
 
     w2ui['layoutPrincipal'].content('left', $().w2sidebar(sidebarLien));
     if (<?php if($this->selection) echo "1"; else echo "0" ?>){
@@ -233,12 +236,68 @@
                         w2alert("Erreur : "+error.responseText+"\n error :"+error);
                     } catch (e) {
                         console.log(error.responseText)            		  	
-                    w2alert("Erreur : "+e+"\n dt :"+dt);
+                        w2alert("Erreur : "+e+"\n dt :"+dt);
                     }
                 },            	
                 success: function(result) {
                     console.log(result);
                     w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+            }
+        });
+    }
+
+    function getDataGroupeFormation(req) {
+        $.ajax({
+                url: "getdatagroupeformation",
+                data: req,
+                type: 'get',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                        // return false;    
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                        w2alert("Erreur : "+e+"\n requested :"+req);
+                        // return false;
+                    }
+                },            	
+                success: function(result) {
+                    console.log(result);
+                    // w2alert("Données reçues du serveur");
+                    //load data in grid 
+                    var jsonavecrecid =result["rs"];
+                    jsonavecrecid = jsonavecrecid.replace(/\"exi_id\":/g, "\"recid\":");
+                    console.log(jsonavecrecid);
+                    var grid ={
+                        name: 'grid',
+                        header: 'Liste des ',
+                        // recid: 'exi_id',
+                        show: {
+                            lineNumbers     : true,
+                            footer          : false,
+                            header          : true,
+                            toolbar         : false,
+                            toolbarColumns  : false,
+                            toolbarSearch   : false,
+                            toolbarReload   : false
+                        }, 
+                        columns: [
+                            { field: 'nom', caption: 'Libellé', size: '30%'},
+                            { field: 'nait', caption: 'Date début', size: '30%'},
+                            { field: 'mort', caption: 'Date Fin', size: '30%'},
+                        ],
+                        // records : jsonavecrecid,
+                    };
+                    if (w2ui['grid']){
+                        w2ui['grid'].destroy();
+                        } 
+                    grid.records = JSON.parse(jsonavecrecid);//result["rs"];
+                    grid.header = grid.header + grid.records["0"].data+"s";
+                    // grid["records"]= result["rs"];
+                    w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
+                    // return result; 
             }
         });
     }

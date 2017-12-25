@@ -226,6 +226,23 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    /*
+     * Recherche des entrées Flux_exi avec la valeur spécifiée
+     * et retourne ces entrées.
+     *
+     * @param string $ids
+     * @param string $champ
+     * 
+     */
+    public function getByChamp($champ,$valeur)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_exi") )                           
+                    ->where( "f.".$champ." = ?",$valeur );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
     
     /**
      * Recherche une entrée Flux_exi avec la valeur spécifiée

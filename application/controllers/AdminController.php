@@ -248,6 +248,23 @@ class AdminController extends Zend_Controller_Action {
 
         $this->view->message = "Données enregistrées!!!";
     }
+
+    public function getdatagroupeformationAction(){
+        $this->initInstance();
+        
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+        $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
+        if($this->_getParam('type'))
+            $typeSidebar = $this->_getParam('type');
+
+        $this->view->rs = json_encode($this->s->dbE->getByChamp("data",$typeSidebar));
+
+    }
  
 
     //pour l'authentification
