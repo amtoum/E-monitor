@@ -99,31 +99,47 @@
             { id: 'controle', text: 'Contrôle'}
         ],
         onClick: function (event) {
+            //création du nested layout
             if(w2ui['nestedLayout']) 
                 w2ui['nestedLayout'].destroy();
             w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
-            if ('<?= ($this->resJSON)?true:false; ?>'){
-                if (w2ui['grid']){
-                w2ui['grid'].destroy();
-                } 
-                w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
-                // $('#grid').w2grid(grid);
-                if (w2ui['formSaveDB'])
-                    w2ui['formSaveDB'].destroy();
-                w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
-            } 
-            else {
-            w2ui['nestedLayout'].content('bottom',
-                '<form enctype="multipart/form-data" action="upload" method="POST">'+
-                '<input type="hidden" name="selection" value="'+event.target+'"/>'+
-                '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
-                'Choose a file to upload:'+
-                '<input name="uploadedfile" type="file" />'+
-                '<br />'+
-                '<input type="submit" value="Upload File" onclick="save();" />'+
-                '</form>'
-            );
+            //remplissage du nested layout en fonction de la sidebar
+            switch (event.target){
+                case 'etudiant':
+                case 'enseignant':
+                    if ('<?= ($this->resJSON)?true:false; ?>'){
+                        if (w2ui['grid']){
+                        w2ui['grid'].destroy();
+                        } 
+                        w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
+                        // $('#grid').w2grid(grid);
+                        if (w2ui['formSaveDB'])
+                            w2ui['formSaveDB'].destroy();
+                        w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
+                    } 
+                    else {
+                        w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Veuillez '+
+                                                                'uploader un fichier CSV qui sera utilisé pour remplir la base de données</div>')
+                        w2ui['nestedLayout'].content('bottom',
+                            '<form enctype="multipart/form-data" action="upload" method="POST">'+
+                            '<input type="hidden" name="selection" value="'+event.target+'"/>'+
+                            '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
+                            'Veuillez choisir le fichier CSV à uploader :'+
+                            '<input name="uploadedfile" type="file"  pattern="*.csv" required/>'+
+                            '<br />'+
+                            '<input type="submit" value="Uploader" onclick="save();" />'+
+                            '</form>'
+                        );
+                    }
+                    break;
+                case 'formation':
+                case 'groupe':
+                case 'controle':
+                    w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Partie '+
+                                                            event.target+' à remplir plus tard</div>')
+                    break;
             }
+        }
             // switch (event.target) {
                 
                 // case 'etudiant':
@@ -144,7 +160,6 @@
                 //     w2ui['layoutPrincipal'].content('main', '<div style="padding: 10px">Groupe</div>');
                 //     break;
             // }
-        }
     };
 
     var grid ={

@@ -196,30 +196,55 @@ class AdminController extends Zend_Controller_Action {
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
 
         //TODO: utiliser le type pour différencier l'ajout d'étudiants ou d'enseignants 
-        // if($this->_getParam('type'))
-        //     echo $this->_getParam('type');
-        
+        if($this->_getParam('type'))
+            $typeSidebar = $this->_getParam('type');
+
         if($this->_getParam('resJSON')){
-            $jsonrecu = $this->_getParam('resJSON');
-            foreach ($jsonrecu as $ligne){
-                //si l'étudiant n'existe pas dans flux_uti
-                
-                $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "etudiant"));
-                $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
-                $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
-                $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
+            if ($typeSidebar == 'etudiant'){
+
+                $jsonrecu = $this->_getParam('resJSON');
+                foreach ($jsonrecu as $ligne){
+                    //si l'étudiant n'existe pas dans flux_uti
+                    
+                    $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "etudiant"));
+                    $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
+                    $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
                     "nait" => "2017-09-01", "niveau" => $idFormationExi)) ;
-                $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
+                    $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
                     "src_id"=>$idEtudiantExi, "src_obj"=>"etudiant",
-                    "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
-                    "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
-                    "valeur"=>"2017-09-01"));
-
-                // echo implode(',',$ligne);
-                // echo ("\n".$ligne["nom"]." ".$ligne["prenom"]." ".$ligne["email"]."\n" );
-
+                        "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
+                        "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
+                        "valeur"=>"2017-09-01"));
+                        
+                        // echo implode(',',$ligne);
+                        // echo ("\n".$ligne["nom"]." ".$ligne["prenom"]." ".$ligne["email"]."\n" );
+                        
+                }
             }
-        }
+            if ($typeSidebar == 'enseignant'){
+
+                $jsonrecu = $this->_getParam('resJSON');
+                foreach ($jsonrecu as $ligne){
+                    //si l'étudiant n'existe pas dans flux_uti
+                    
+                    $idEnseignantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "enseignant"));
+                    $idEnseignantExi = $this->s->dbE->ajouter(array("uti_id" => $idEnseignantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
+                    $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
+                    "nait" => "2017-09-01", "niveau" => $idFormationExi)) ;
+                    $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
+                    "src_id"=>$idEnseignantExi, "src_obj"=>"enseignant",
+                        "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
+                        "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
+                        "valeur"=>"2017-09-01"));
+                        
+                        // echo implode(',',$ligne);
+                        // echo ("\n".$ligne["nom"]." ".$ligne["prenom"]." ".$ligne["email"]."\n" );
+                        
+                }
+            }
+        }    
 
         $this->view->message = "Données enregistrées!!!";
     }
