@@ -60,6 +60,7 @@ class AuthController extends Zend_Controller_Action
     
     public function casAction()
     {
+		$ssExi = new Zend_Session_Namespace('uti');
     	/**
     	 * The purpose of this central config file is configuring all examples
     	 * in one place with minimal work for your working environment
@@ -146,10 +147,10 @@ class AuthController extends Zend_Controller_Action
     	// Set the session-name to be unique to the current script so that the client script
     	// doesn't share its session with a proxied script.
     	// This is just useful when running the example code, but not normally.
-    	session_name(
-    			'session_for:'
-    			. preg_replace('/[^a-z0-9-]/i', '_', basename($_SERVER['SCRIPT_NAME']))
-    			);
+    	// session_name(
+    	// 		'session_for:'
+    	// 		. preg_replace('/[^a-z0-9-]/i', '_', basename($_SERVER['SCRIPT_NAME']))
+    	// 		);
     	    	 
     	// Set an UTF-8 encoding header for internation characters (User attributes)
     	header('Content-Type: text/html; charset=utf-8');
@@ -173,7 +174,6 @@ class AuthController extends Zend_Controller_Action
     	
     	// force CAS authentication
     	phpCAS::forceAuthentication();
-    	
     	// at this step, the user has been authenticated by the CAS server
     	// and the user's login name can be read with phpCAS::getUser().
     	
@@ -181,20 +181,117 @@ class AuthController extends Zend_Controller_Action
     	if (isset($_REQUEST['logout'])) {
     		phpCAS::logout();
     	}    	    	
-	$this->view->user = phpCAS::getAttributes();	
+		$this->view->user = phpCAS::getUser();	
+
+		
 	
 
-	//paramètres de redirection
-	 $dbNom = $this->_getParam('idBase');
-	 $redir = $this->_getParam('redir');
-	 $s = new Flux_Site($dbNom);	
-	
-	//met en sessions les informations de l'existence
-	$dbUti = new Model_DbTable_Flux_Uti($s->db);
-	// $rs = $dbUti->ajouter(array("login"=>$this->view->user),true,true);
-    //redirige l'utilisteur si besoin
-    if($redir)
-		$this->_redirect($redir."?idUti=".$rs[0]["uti_id"]);	
-	
-    }
+		//paramètres de redirection
+		$dbNom = $this->_getParam('idBase');
+		$redir = $this->_getParam('redir');
+		$s = new Flux_Site($dbNom);	
+		
+		//met en sessions les informations de l'existence
+		$dbUti = new Model_DbTable_Flux_Uti($s->db);
+		$id = $dbUti->ajouter(array("login"=>$this->view->user),true,false);
+		$role = $dbUti->getRoleById($id) ;
+		$auth = phpCAS::checkAuthentication();
+		if (!$auth) {
+			$_SESSION["service_id_auth"] = $GLOBALS["TSFE"]->id;
+			header('Location: ' . t3lib_div::locationHeaderUrl($this->pi_getPageLink($idPageAuth, "", array("action" => "auth"))));
+			exit;
+		} else {
+			$_SESSION["user"] = phpCAS::getUser();
+			$_SESSION["role"] = $role;
+		}
+		switch ($role) {
+			case "etudiant" :
+				$this->view->role = "ETUDIANT";
+				$this->redirect('/carte/roueemotion');
+				
+
+
+
+				break;
+			case "enseignant" :
+				$this->view->role = "ENSEIGNANT";
+				break;
+			case "admin" :
+				$this->view->role = "ADMIN";
+				$this->redirect('/admin/importcsv');
+				// $ssExi = new Zend_Session_Namespace('uti');
+				// if($this->_getParam('idBase'))$ssExi->dbNom = $this->_getParam('idBase');	
+				// $s = new Flux_Site($ssExi->dbNom);
+				
+				// if($this->_getParam('redir', 0)){
+				// 	$ssExi->redir='/'.$this->_getParam('redir', 0);
+				// }
+				
+				// 	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
+				// // $auth = Zend_Auth::getInstance();
+				// // $auth->clearIdentity();
+		
+
+				// 	$adapter = new Zend_Auth_Adapter_DbTable(
+				// 		$s->db,
+				// 		'flux_uti',
+				// 		'login',
+				// 		'mdp'
+				// 		);		                
+				// 	$adapter->setIdentity($this->view->user);
+				// 	$adapter->setCredential("");
+					
+				// 	// Tentative d'authentification et stockage du résultat
+					
+					
+				// 	$auth   = Zend_Auth::getInstance();
+				// 	$result = $auth->authenticate($adapter);
+					
+				// 	//TODO: modifier après création de session et login CAS
+				// 	//si le login correspond à un admin
+				// 	if ($result->isValid() && $loginForm->getValue('login')=="admin") {
+				// 		$this->_helper->FlashMessenger('Successful Login');
+				// 		$this->redirect('/admin/importcsv');
+				// 		return;
+				// 	}
+				// 	//si le login correspond à un utilisateur
+				// 	else if ($result->isValid()) {
+				// 		$this->_helper->FlashMessenger('Successful Login');
+				// 		$this->redirect('/carte/roueemotion');
+				// 		return;
+				// 	}
+				// 	else {
+				// 		$this->view->message = 'Login failed';
+				// 	}
+
+				break;
+		
+		
+		
+		//redirige l'utilisteur si besoin
+		// if($redir)
+		// 	$this->_redirect($redir."?idUti=".$rs[0]["uti_id"]);	
+		
+		}
+	}
+
+	public function deconnexionAction()
+	{
+		$this->clearConnexion();
+	}
+
+	public function finsessionAction()
+	{
+		
+	}
+
+	function clearConnexion(){
+		$ssExi = new Zend_Session_Namespace('uti'); 		   	
+		$redir = $ssExi->redir;
+		Zend_Session::namespaceUnset('uti');
+		$auth = Zend_Auth::getInstance();
+		$auth->clearIdentity();
+			$this->_redirect($redir);            	
+	} 
+
 }

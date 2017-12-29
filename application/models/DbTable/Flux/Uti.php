@@ -282,4 +282,18 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     	return $arrRoles;        
     } 
     
+    /**
+     * renvoie le rôle pour un id donné
+     *
+     * @return role
+     */
+    public function getRoleById($id)
+    {
+    	$query = $this->select()
+                    ->from( array("f" => "flux_uti") )                           
+                    ->where( "f.uti_id = ?", $id );
+		$arr = $this->fetchAll($query)->toArray();
+        return $arr[0]["role"];       
+    }
+
 }
