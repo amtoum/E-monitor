@@ -207,8 +207,9 @@ class AuthController extends Zend_Controller_Action
 		switch ($role) {
 			case "etudiant" :
 				$this->view->role = "ETUDIANT";
-				$this->redirect('/carte/roueemotion');
-				
+				//TODO: redirect vers version finale de la roue
+				// $this->redirect('/carte/roueemotion');
+				$this->redirect('/carte/roue');
 
 
 

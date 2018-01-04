@@ -70,6 +70,16 @@ class CarteController extends Zend_Controller_Action
         $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
     }  
     
+    public function roueAction(){
+        $this->initInstance();
+        
+        // $this->view->data =  $this->_getParam('data', $dt);
+        // $this->view->w =  $this->_getParam('w', 0);
+        // $this->view->h =  $this->_getParam('h', 0);
+        // $this->view->langue =  $this->_getParam('langue', "fr");
+        // $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
+    }
+
     public function saverepquestAction(){
         $this->initInstance();
         
