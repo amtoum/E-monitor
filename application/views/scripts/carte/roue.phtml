@@ -2,17 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Sequences sunburst</title>
-    <script src="../js//d3.v4.min.js"></script>
-    <link rel="stylesheet" type="text/css"
-      href="../css/opensans.css">
+    <title>E-monitor - Espace Etudiant</title>
+    <script src="../js/d3.v4.min.js"></script>
+    <link rel="stylesheet" type="text/css"       href="../css/opensans.css">
     <link rel="stylesheet" type="text/css" href="../css/sequences.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
   </head>
   <body>
-    <div id="main">
+    <div id="main" >
       <span id="selectedDisplay" ></div>
-      <div id="sequence" ></div>
-      <div id="chart">
+      <!-- <div id="sequence" ></div> -->
+      <div id="chart"align="center">
         <div id="explanation" style="visibility: hidden;">
           <span id="percentage"></span><br/>
         </div>
@@ -27,5 +28,11 @@
       // Hack to make this example display correctly in an iframe on bl.ocks.org
       d3.select(self.frameElement).style("height", "700px");
   </script> 
+  </br>
+  </br>
+  <div class="w2ui-buttons" align="center">
+	  <button class="w2ui-btn" name="reset">Annuler</button>
+		<button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>
+	</div>
   </body>
 </html>

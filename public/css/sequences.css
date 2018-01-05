@@ -33,7 +33,7 @@ body {
 }
 
 #chart {
-  position: relative;
+  position: center;
 }
 
 #chart path {
