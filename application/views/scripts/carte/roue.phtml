@@ -4,35 +4,45 @@
     <meta charset="utf-8">
     <title>E-monitor - Espace Etudiant</title>
     <script src="../js/d3.v4.min.js"></script>
-    <link rel="stylesheet" type="text/css"       href="../css/opensans.css">
+    <script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.blast.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="../css/opensans.css">
     <link rel="stylesheet" type="text/css" href="../css/sequences.css"/>
     <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
     <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
   </head>
   <body>
-    <div id="main" >
-      <span id="selectedDisplay" ></div>
-      <!-- <div id="sequence" ></div> -->
-      <div id="chart"align="center">
-        <div id="explanation" style="visibility: hidden;">
-          <span id="percentage"></span><br/>
-        </div>
-      </div>
-    </div>
-    <div id="sidebar"  style="visibility: hidden;">
-      <input type="checkbox" id="togglelegend" style="visibility: hidden;"> Legend<br/>
-      <div id="legend" style="visibility: hidden;"></div>
-    </div>
-    <script type="text/javascript" src="../js/sequences.js"></script>
-    <script type="text/javascript">
-      // Hack to make this example display correctly in an iframe on bl.ocks.org
-      d3.select(self.frameElement).style("height", "700px");
-  </script> 
-  </br>
-  </br>
-  <div class="w2ui-buttons" align="center">
-	  <button class="w2ui-btn" name="reset">Annuler</button>
-		<button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>
-	</div>
+    
+
+<div id="layout" style="width: 100%; height: 720px;"></div>
+<script type="text/javascript">
+$(function () {
+    var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+    $('#layout').w2layout({
+        name: 'layout',
+        panels: [
+            { type: 'top', size: 50, style: pstyle, content: 'Espace Etudiant' },
+            { type: 'main', size: 700, style: pstyle, content: '<div id="chart" align="center"></div>' },
+            { type: 'bottom', size: 50, style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
+		    '<button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+	    '</div>' }
+        ]
+    });
+});
+
+function addScript(JSfileName) {
+var js = document.createElement('script');
+js.setAttribute('type', 'text/javascript');
+js.src = JSfileName;
+document.body.appendChild(js);
+}
+
+setTimeout(function(){
+// d3.select(chartw2ui).style("height", "700px");
+addScript('../js/sequences.js');
+}, 100);
+</script>
+
   </body>
 </html>

@@ -349,10 +349,10 @@ function createVisualization(json) {
 function mouseover(d) {
 
   
-  if(d.data.intensity > 0 && d.data.intensity < 100)
-  {
+  /*if(d.data.intensity > 0 && d.data.intensity < 100)
+  {*/
 	d3.select(this).style("cursor", "pointer");
-  }
+  //}
   var sequenceArray = d.ancestors().reverse();
   
 	//displayMouseOver(d);
@@ -377,7 +377,7 @@ function mouseover(d) {
   // Then highlight only those that are an ancestor of the current segment.
   vis.selectAll("path")
       .filter(function(node) {
-                return (sequenceArray.indexOf(node) >= 0 && (d.data.intensity < 100 || sequenceArray.indexOf(node) < sequenceArray.length - 1));
+                return (sequenceArray.indexOf(node) >= 0 && (/*d.data.intensity < 100 ||*/ sequenceArray.indexOf(node) <= sequenceArray.length - 1));
               })
       .style("opacity", 1);
 	}
@@ -385,12 +385,12 @@ function mouseover(d) {
 function mouseoverText(d) {
 
   
-  if(d.data.intensity > 0 && d.data.intensity < 100)
-  {
+  /*if(d.data.intensity > 0 && d.data.intensity < 100)
+  {*/
 	d3.select(this).style("cursor", "pointer");
-  }else{
+  /*}else{
 	  d3.select(this).style("cursor", "default");
-  }
+  }*/
 }
 function displayMessageCenter(d)
 {
@@ -468,19 +468,23 @@ function mouseleave(d) {
 }
 function HighlightSelectedEmotions()
 {
-		  for(var i = 0; i < selectedEmotion.length; i++)
-		  {
-			var sequenceArray = selectedEmotion[i].ancestors().reverse();
+  for(var i = 0; i < selectedEmotion.length; i++)
+  {
+	var sequenceArray = selectedEmotion[i].ancestors().reverse();
+if(selectedEmotion[i].children.length == 1 && selectedEmotion[i].children[0].data.intensity == 100)
+	sequenceArray.push(selectedEmotion[i].children[0]);
 
-		  // Then highlight only those that are an ancestor of the current segment.
-		  vis.selectAll("path")
-		  .filter(function(node) {
-					return (sequenceArray.indexOf(node) >= 0);
-				  })
-		  .style("opacity", 1);
-		  
-			//displayAriane(selectedEmotion[i]);
-		  }
+  // Then highlight only those that are an ancestor of the current segment.
+  vis.selectAll("path")
+  .filter(function(node) {
+			return (sequenceArray.indexOf(node) >= 0);
+		  })
+  .style("opacity", 1);
+  
+
+  
+	//displayAriane(selectedEmotion[i]);
+  }
 }
 function initializeBreadcrumbTrail() {
   // Add the svg area.
@@ -649,7 +653,7 @@ function buildHierarchy(csv) {
 function click(d) {
   console.log("Clicked");
   var hasUnselectedEmotion = false;
-  if(selectedEmotion != null && selectedEmotion.length > 0 && d.data.intensity < 100)
+  if(selectedEmotion != null /* && selectedEmotion.length > 0 && d.data.intensity < 100*/)
   { // Click on the same emotion, we unselect it
 	for(var i = 0; i < selectedEmotion.length; i++)
 	{
@@ -662,8 +666,19 @@ function click(d) {
 	}
   }
   
-  if(d.data.intensity > 0 && d.data.intensity < 100 && !hasUnselectedEmotion && selectedEmotion.length < maxEmotions)
-	selectedEmotion.push(d);
+  if(/*d.data.intensity > 0 && d.data.intensity < 100 &&*/ !hasUnselectedEmotion && selectedEmotion.length < maxEmotions)
+  {
+	  if(d.data.intensity == 0)
+	  {
+		selectedEmotion.push(d.children[0]);
+	  }  
+	  else if(d.data.intensity == 100)
+	  {
+		selectedEmotion.push(d.ancestors()[1]);
+	  }
+	  else 
+		selectedEmotion.push(d);
+  }
 
 var textToDisplay = "Selected :";
 for(var i = 0; i < selectedEmotion.length; i++)
