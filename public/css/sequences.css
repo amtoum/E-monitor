@@ -33,7 +33,7 @@ body {
 }
 
 #chart {
-  position: center;
+  position: relative;
 }
 
 #chart path {
@@ -52,4 +52,7 @@ body {
 
 #percentage {
   font-size: 2.5em;
+}
+.dots {
+  cursor: pointer;
 }

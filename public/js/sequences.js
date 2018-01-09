@@ -1,47 +1,230 @@
 var maxEmotions = 2;
-var intensities = [
-		{ 
-			"name" : "Intensité 1",
-			"color": "#00FF15"
-		},
-		{ 
-			"name" : "Intensité 2",
-			"color": "#00FF15"
-		},
-		{ 
-			"name" : "Intensité 3",
-			"color": "#00FF15"
-		},
-		{ 
-			"name" : "Intensité 4",
-			"color": "#00FF15"
-		},
-		{ 
-			"name" : "Intensité 5",
-			"color": "#009109"
-		}
-];
+
 
 var datas = [
 	{
-		"name":"joie",
+		"name":"content",
 		"value":1,
-		"color": "#8E3829"
+		"color": "#FFFF50",
+		"nameFinalEmotion":"enthousiaste",
+		"colorFinalEmotion": "#FFFF00",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#FFFF50"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#FFFF40"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#FFFF30"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#FFFF20"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#FFFF10"
+		}]
 	},
 	{
-		"name":"peur",
+		"name":"étonné",
 		"value":1,
-		"color": "#565D8C"
+		"color": "#C8FF50",
+		"nameFinalEmotion":"stupéfait",
+		"colorFinalEmotion": "#C8FF00",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#C8FF50"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#C8FF40"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#C8FF30"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#C8FF20"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#C8FF10"
+		}]
+  },
+	{
+		"name":"intéressé",
+		"value":1,
+		"color": "#FF8825",
+		"nameFinalEmotion":"motivé",
+		"colorFinalEmotion": "#FF8800",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#FF8825"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#FF8820"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#FF8815"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#FF8810"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#FF8805"
+		}]
 	},
 	{
-		"name":"degout",
+		"name":"tranquille",
 		"value":1,
-		"color": "#4F897A"
+		"color": "#00FF50",
+		"nameFinalEmotion":"confiant",
+		"colorFinalEmotion": "#00FF00",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#00FF50"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#00FF40"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#00FF30"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#00FF20"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#00FF10"
+		}]
+	},
+  {
+		"name":"triste",
+		"value":1,
+		"color": "#4CF0FF",
+		"nameFinalEmotion":"déprimé",
+		"colorFinalEmotion": "#4CF0AF",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#4CF0FF"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#4CF0EF"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#4CF0DF"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#4CFCFF"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#4CF0BF"
+		}]
+  },
+  {
+		"name":"ennuyé",
+		"value":1,
+		"color": "#0080AA",
+		"nameFinalEmotion":"angoissé",
+		"colorFinalEmotion": "#008050",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#0080AA"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#008090"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#008080"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#008070"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#008060"
+		}]
 	},
 	{
-		"name":"haine",
+		"name":"inquiet",
 		"value":1,
-		"color": "#87683F"
+		"color": "#E502FF",
+		"nameFinalEmotion":"angoissé",
+		"colorFinalEmotion": "#E502AA",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#E502EE"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#E502DD"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#E502CC"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#E502BB"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#E50FAA"
+		}]
+  },
+  {
+		"name":"agacé",
+		"value":1,
+		"color": "#FF0450",
+		"nameFinalEmotion":"furieux",
+		"colorFinalEmotion": "#FF0400",
+		"intensities" : [
+		{ 
+			"name" : "Intensité 1",
+			"color": "#FF0450"
+		},
+		{ 
+			"name" : "Intensité 2",
+			"color": "#FF0440"
+		},
+		{ 
+			"name" : "Intensité 3",
+			"color": "#FF0430"
+		},
+		{ 
+			"name" : "Intensité 4",
+			"color": "#FF0420"
+		},
+		{ 
+			"name" : "Intensité 5",
+			"color": "#FF0410"
+		}]
 	}
 ];
 
@@ -139,6 +322,7 @@ function createVisualization(json) {
                 return 'translate(' + arc.centroid(d) + ') rotate(' + computeTextRotation(d) + ')'; })
             .attr('dx', '-20')
             .attr('dy', '.5em')
+			.on("mouseover", mouseoverText)
             .text(function(d) { return d.data.name })
 	  .on("click", click);
 	  
@@ -165,6 +349,10 @@ function createVisualization(json) {
 function mouseover(d) {
 
   
+  if(d.data.intensity > 0 && d.data.intensity < 100)
+  {
+	d3.select(this).style("cursor", "pointer");
+  }
   var sequenceArray = d.ancestors().reverse();
   
 	//displayMouseOver(d);
@@ -189,10 +377,20 @@ function mouseover(d) {
   // Then highlight only those that are an ancestor of the current segment.
   vis.selectAll("path")
       .filter(function(node) {
-                return (sequenceArray.indexOf(node) >= 0);
+                return (sequenceArray.indexOf(node) >= 0 && (d.data.intensity < 100 || sequenceArray.indexOf(node) < sequenceArray.length - 1));
               })
       .style("opacity", 1);
 	}
+}
+function mouseoverText(d) {
+
+  
+  if(d.data.intensity > 0 && d.data.intensity < 100)
+  {
+	d3.select(this).style("cursor", "pointer");
+  }else{
+	  d3.select(this).style("cursor", "default");
+  }
 }
 function displayMessageCenter(d)
 {
@@ -236,6 +434,7 @@ function displayMouseOver(d)
 // Restore everything to full opacity when moving off the visualization.
 function mouseleave(d) {
 	
+	d3.select(this).style("cursor", "default"); 
 	  // Hide the breadcrumb trail
 	  d3.select("#trail")
 		  .style("visibility", "hidden");
@@ -408,7 +607,10 @@ function buildHierarchy(csv) {
     if (isNaN(size)) { // e.g. if this is a header row
       continue;
     }
-    var parts = [ { "name":csv[i].name, "emotion":csv[i].name, "intensity":0, "color":csv[i].color}].concat(intensities);
+	var finalEmotion = { "name":csv[i].nameFinalEmotion, "emotion":csv[i].name, "intensity":100, "color":csv[i].colorFinalEmotion, "size": size + 1};
+    var parts = [ 
+		{ "name":csv[i].name, "emotion":csv[i].name, "intensity":0, "color":csv[i].color}
+	   ].concat(csv[i].intensities);
     var currentNode = root;
     for (var j = 0; j < parts.length; j++) {
       var children = currentNode["children"];
@@ -433,10 +635,11 @@ function buildHierarchy(csv) {
  	currentNode = childNode;
       } else {
  	// Reached the end of the sequence; create a leaf node.
- 	childNode = {"name": nodeName, "emotion":csv[i].name, "color":nodeColor,"intensity":j, "size": size};
+ 	childNode = {"name": nodeName, "emotion":csv[i].name, "color":nodeColor,"intensity":j, "children":[finalEmotion]};
  	children.push(childNode);
       }
     }
+	
 	
   }
   console.log(root);
@@ -446,7 +649,7 @@ function buildHierarchy(csv) {
 function click(d) {
   console.log("Clicked");
   var hasUnselectedEmotion = false;
-  if(selectedEmotion != null && selectedEmotion.length > 0)
+  if(selectedEmotion != null && selectedEmotion.length > 0 && d.data.intensity < 100)
   { // Click on the same emotion, we unselect it
 	for(var i = 0; i < selectedEmotion.length; i++)
 	{
@@ -459,7 +662,7 @@ function click(d) {
 	}
   }
   
-  if(d.data.intensity > 0 && !hasUnselectedEmotion && selectedEmotion.length < maxEmotions)
+  if(d.data.intensity > 0 && d.data.intensity < 100 && !hasUnselectedEmotion && selectedEmotion.length < maxEmotions)
 	selectedEmotion.push(d);
 
 var textToDisplay = "Selected :";
