@@ -146,7 +146,7 @@ var datas = [
 		"name":"ennuyé",
 		"value":1,
 		"color": "#0080AA",
-		"nameFinalEmotion":"angoissé",
+		"nameFinalEmotion":"dégoûté",
 		"colorFinalEmotion": "#008050",
 		"intensities" : [
 		{ 

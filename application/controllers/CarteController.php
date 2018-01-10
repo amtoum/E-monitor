@@ -78,6 +78,8 @@ class CarteController extends Zend_Controller_Action
         // $this->view->h =  $this->_getParam('h', 0);
         // $this->view->langue =  $this->_getParam('langue', "fr");
         // $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
+        if ($_SESSION["user"])
+        $this->view->user =  $this->_getParam('user', $_SESSION["user"] );
     }
 
     public function saverepquestAction(){

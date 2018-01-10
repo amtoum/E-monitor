@@ -31,7 +31,9 @@
 
     <script >
     
-    var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 0px;';
+    var user = '<?php echo $this->user;?>';
+
+    var pstyle = 'background-color: #323948; border: 1px solid #dfdfdf; padding: 5px;';
 
     if(w2ui['layoutPrincipal'])w2ui['layoutPrincipal'].destroy();		
             $('#layoutPrincipal').w2layout({
@@ -39,7 +41,7 @@
                 padding: 2,
                 panels: [
                     { type: 'top', size: 70, resizable: false, style: pstyle, content:'<div style="float: left;">Espace Administrateur '+
-                        '<br>Connecté en tant que : '+
+                        '<br>Connecté en tant que : '+ user +
                         '</div>'+
                         '<div class="w2ui-buttons" style="float: right;" >'+
                         '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
@@ -77,7 +79,7 @@
     
     var formSaveDB = {
 		    name: 'formSaveDB',
-		    style: 'border: 0px',
+		    style: 'border: 0px; padding: 0px;',
 		    formHTML: 
 		        '<div class="w2ui-buttons">'+
 		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
@@ -101,7 +103,8 @@
             { id: 'enseignant', text: 'Enseignants'},
             { id: 'groupe', text: 'Groupes'},
             { id: 'formation', text: 'Formations'},
-            { id: 'controle', text: 'Contrôle'}
+            //TODO: put back contrôle
+            // { id: 'controle', text: 'Contrôle'}
         ],
         onClick: function (event) {
             //création du nested layout
@@ -132,10 +135,10 @@
                                 '<form enctype="multipart/form-data" action="upload" method="POST">'+
                                 '<input type="hidden" name="selection" value="'+event.target+'"/>'+
                                 '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
-                                'Veuillez choisir le fichier CSV à uploader :'+
-                                '<input name="uploadedfile" type="file"  pattern="*.csv" required/>'+
+                                'Veuillez choisir le fichier CSV à uploader : '+
+                                '<input class="w2ui-btn w2ui-btn-green" name="uploadedfile" type="file"  pattern="*.csv" required/>'+
                                 '<br />'+
-                                '<input type="submit" value="Uploader" onclick="save();" />'+
+                                '<input class="w2ui-btn w2ui-btn-green" type="submit" value="Uploader" onclick="save();" />'+
                                 '</form>'
                             );
                         }

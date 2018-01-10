@@ -50,6 +50,9 @@ class AdminController extends Zend_Controller_Action {
             $this->view->selection = $this->_getparam('selection');
         }
 
+        if ($_SESSION["user"])
+        $this->view->user =  $this->_getParam('user', $_SESSION["user"] );
+
         // Import csv et echo
         
         // $this->view->titre =  $this->_getParam('titre', "Page Test admin");
