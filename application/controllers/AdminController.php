@@ -196,7 +196,7 @@ class AdminController extends Zend_Controller_Action {
         
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
 
-        //TODO: utiliser le type pour différencier l'ajout d'étudiants ou d'enseignants 
+        //DONE: utiliser le type pour différencier l'ajout d'étudiants ou d'enseignants 
         if($this->_getParam('type'))
             $typeSidebar = $this->_getParam('type');
 
@@ -206,7 +206,7 @@ class AdminController extends Zend_Controller_Action {
                 $jsonrecu = $this->_getParam('resJSON');
                 foreach ($jsonrecu as $ligne){
                     //si l'étudiant n'existe pas dans flux_uti
-                    
+                    //TODO: flux_uti et obligation d'utilisation de l'email comme login ou le nom d'utilisateur
                     $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "etudiant"));
                     $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
                     $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;

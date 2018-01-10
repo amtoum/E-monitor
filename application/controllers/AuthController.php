@@ -279,6 +279,7 @@ class AuthController extends Zend_Controller_Action
 	public function deconnexionAction()
 	{
 		Zend_Session::destroy($remove_cookie = true, $readonly = true);
+		phpCAS::logout();
 		// $this->clearConnexion();
 	}
 

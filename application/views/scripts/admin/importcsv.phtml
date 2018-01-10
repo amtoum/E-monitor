@@ -38,11 +38,12 @@
                 name: 'layoutPrincipal',
                 padding: 2,
                 panels: [
-                    { type: 'top', size: 70, resizable: false, style: pstyle, content: 
-                        '<h4 style="color:#000000;" >'
-                        +'<?php echo $this->titre;?>'
-                        +'</h4>'
-                        },
+                    { type: 'top', size: 70, resizable: false, style: pstyle, content:'<div style="float: left;">Espace Administrateur '+
+                        '<br>Connecté en tant que : '+
+                        '</div>'+
+                        '<div class="w2ui-buttons" style="float: right;" >'+
+                        '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
+                        '</div>'},
                     { type: 'left', size: 200, style: pstyle, content: 'left' },
                     { type: 'main', style: pstyle, content: 
                     '<div id="nestedLayout" style="padding: 10px">Selectionner une catégorie dans la barre latérale</div>' }
@@ -51,6 +52,10 @@
     
     function save () { 
         console.log("***************save************"); 
+    }
+
+    function disconnect() {
+        window.location.href="../auth/deconnexion";
     }
     
     var nestedLayout ={
@@ -107,31 +112,34 @@
             switch (event.target){
                 case 'etudiant':
                 case 'enseignant':
-                    if ('<?= ($this->resJSON)?true:false; ?>'){
-                        if (w2ui['grid']){
-                        w2ui['grid'].destroy();
+
+                    
+                        if(<?php if($this->selection) echo '"'.$this->selection.'"'; else echo "{}" ?> == event.target){    
+                            if (w2ui['grid']){
+                            w2ui['grid'].destroy();
+                            } 
+                            w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
+                            // $('#grid').w2grid(grid);
+                            if (w2ui['formSaveDB'])
+                                w2ui['formSaveDB'].destroy();
+                            w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
+                    
                         } 
-                        w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
-                        // $('#grid').w2grid(grid);
-                        if (w2ui['formSaveDB'])
-                            w2ui['formSaveDB'].destroy();
-                        w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
-                    } 
-                    else {
-                        w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Veuillez '+
-                                                                'uploader un fichier CSV qui sera utilisé pour remplir la base de données</div>')
-                        w2ui['nestedLayout'].content('bottom',
-                            '<form enctype="multipart/form-data" action="upload" method="POST">'+
-                            '<input type="hidden" name="selection" value="'+event.target+'"/>'+
-                            '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
-                            'Veuillez choisir le fichier CSV à uploader :'+
-                            '<input name="uploadedfile" type="file"  pattern="*.csv" required/>'+
-                            '<br />'+
-                            '<input type="submit" value="Uploader" onclick="save();" />'+
-                            '</form>'
-                        );
-                    }
-                    break;
+                        else {
+                            w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Veuillez '+
+                                                                    'uploader un fichier CSV qui sera utilisé pour remplir la base de données</div>')
+                            w2ui['nestedLayout'].content('bottom',
+                                '<form enctype="multipart/form-data" action="upload" method="POST">'+
+                                '<input type="hidden" name="selection" value="'+event.target+'"/>'+
+                                '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
+                                'Veuillez choisir le fichier CSV à uploader :'+
+                                '<input name="uploadedfile" type="file"  pattern="*.csv" required/>'+
+                                '<br />'+
+                                '<input type="submit" value="Uploader" onclick="save();" />'+
+                                '</form>'
+                            );
+                        }
+                break;
                 case 'formation':
                 case 'groupe':
                 // case 'controle':
@@ -139,7 +147,7 @@
                                                             event.target+' à remplir plus tard</div>');
                     var json = {"type" : event.target};
                     getDataGroupeFormation(json);
-                    break;
+                break;
             }
         }
             // switch (event.target) {
@@ -228,7 +236,7 @@
         $.ajax({
                 url: "savejsonintodb",
                 data: dt,
-                type: 'get',
+                type: 'post',
                 dataType: 'json',
                 error: function(error){
                     try {
