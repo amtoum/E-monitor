@@ -274,7 +274,9 @@ class AdminController extends Zend_Controller_Action {
         $session =  session_start();
         // $auth = Zend_Auth::getInstance();
         $role = $_SESSION["role"];
-		if ($role == "admin" && $session) {						
+		// if ($role == "admin" && $session) {						
+            //TODO: remettre la ligne au dessus (verif que le rôle == admin) après démo
+            if ($session) {						
 			// l'identité existe ; on la récupère
 		    $this->view->identite = $_SESSION["user"];
 		    // $ssUti = new Zend_Session_Namespace('uti');

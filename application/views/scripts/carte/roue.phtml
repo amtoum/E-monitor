@@ -26,7 +26,7 @@
                   '<br>Connecté en tant que'+
                   '</div>'+
                   '<div class="w2ui-buttons" style="float: right;" >'+
-                  '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion">Déconnexion</button>'+
+                  '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
                   '</div>'},
                 { type: 'main', size: 700, style: pstyle, content: '<div id="chart" style= float :center"></div>' },
                 { type: 'bottom', size: 50, style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
@@ -65,6 +65,10 @@
               w2alert("Emotions enregistrées :)");
 		        }
 			});
+    }
+    
+    function disconnect() {
+			window.location.href="../auth/deconnexion";
 		}
 
     function addScript(JSfileName) {

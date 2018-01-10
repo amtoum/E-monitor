@@ -278,7 +278,8 @@ class AuthController extends Zend_Controller_Action
 
 	public function deconnexionAction()
 	{
-		$this->clearConnexion();
+		Zend_Session::destroy($remove_cookie = true, $readonly = true);
+		// $this->clearConnexion();
 	}
 
 	public function finsessionAction()
@@ -292,7 +293,7 @@ class AuthController extends Zend_Controller_Action
 		Zend_Session::namespaceUnset('uti');
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
-			$this->_redirect($redir);            	
+		$this->_redirect($redir);            	
 	} 
 
 }
