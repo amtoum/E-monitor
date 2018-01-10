@@ -113,7 +113,51 @@ class CarteController extends Zend_Controller_Action
        
     }
     
-    
+
+    public function saverepd3Action(){
+        $this->initInstance();
+        
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        
+        
+        $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
+        $this->idDocEvalRoot = $this->s->dbD->ajouter(array("titre"=>"évaluationsD3"));
+        
+        //enregistre l'émotion évaluée
+        if($this->_getParam('emo')){
+            $this->saveRepEmo($this->_getParam('emo'),$this->idDocEvalRoot);
+            $this->view->message = "Emotion enregistrée.";
+        }
+        
+        //enregistre toutes les émotions de la roue d3
+        if($this->_getParam('emotions')){
+            $data = $this->_getParam('emotions');
+            //enregistre chaque émotion
+            $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation roue émotion","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
+            foreach ($data as $emo) {
+                $this->saveRepEmoD3($emo,$idDocEval);
+            }
+            $this->view->message = "Emotions enregistrées.";
+        }
+       
+    }
+    function saveRepEmoD3($emo,$idDocEval){
+        $idTag = $this->s->dbT->ajouter(array("code"=>$emo["emotion"]));
+        //enregistre la réponse à la question par l'utilistaeur
+        $intensite = preg_replace('/[^0-9]/', '', $emo["name"]);
+        $idRapRep = $this->s->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+            ,"src_id"=>$idTag,"src_obj"=>"tag"
+            ,"pre_id"=>$idDocEval,"pre_obj"=>"doc"
+            ,"dst_id"=>$this->idDocEvalRoot,"dst_obj"=>"doc"
+            ,"niveau"=>$intensite
+        ),false);
+    }
+
     function saveRepEmo($emo,$idDocEval){
         $idTag = $this->s->dbT->ajouter(array("code"=>$emo["fr"]));
         //enregistre la réponse à la question par l'utilistaeur

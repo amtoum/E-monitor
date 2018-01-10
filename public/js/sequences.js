@@ -256,8 +256,9 @@ var vis = d3.select("#chart").append("svg:svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
-    .attr("id", "container")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    // .attr("id", "container")
+		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+		.attr("align","center");;
 
 var partition = d3.partition()
     .size([2 * Math.PI, radius * radius]);
