@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>E-monitor - Espace Etudiant</title>
-    <script src="../js/d3.v4.min.js"></script>
+    <script src="../js/d3.js"></script>
     <script src="../js/jquery.min.js" charset="utf-8"></script>
 		<script src="../js/jquery.blast.min.js"></script>
     <script src="../js/w2ui.js" charset="utf-8"></script>
@@ -16,7 +16,7 @@
     
   
     <!-- <div id="layout" style="width: 80%; height: 720px; left:50%;margin-left:50%;"></div> -->
-    <div id="layout" style="width: 90%; height: 800px; "></div>
+    <div id="layout" style="width: 100%; height: 820px; "></div>
     <script >
 
     var user = '<?php echo $this->user;?>';
@@ -25,15 +25,15 @@
         $('#layout').w2layout({
             name: 'layout',
             panels: [
-                { type: 'top', size: 50, style: pstyle, content: '<div style="float: left;">Espace Etudiant '+
+                { type: 'top', size: 100, style: pstyle, content: '<div style="float: left; font-size:30px;">Espace Etudiant '+
                   '<br>Connecté en tant que : '+ user+
                   '</div>'+
                   '<div class="w2ui-buttons" style="float: right;" >'+
-                  '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
+                  '<button class="w2ui-btn w2ui-btn-grey" style="font-size:30px;" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
                   '</div>'},
                 { type: 'main', size: 800, style: pstyle, content: '<div id="vis" style= float :center"></div>' },
-                { type: 'bottom', size: 50, style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
-            '<button class="w2ui-btn w2ui-btn-green" name="save" onclick="saveEmotion()">Enregistrer</button>'+
+                { type: 'bottom', size: 60, style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
+            '<button class="w2ui-btn w2ui-btn-green" style="font-size:30px;" name="save" onclick="saveEmotion()">Enregistrer</button>'+
           '</div>' }
             ]
         });
