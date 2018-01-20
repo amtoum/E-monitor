@@ -16,7 +16,7 @@
     
   
     <!-- <div id="layout" style="width: 80%; height: 720px; left:50%;margin-left:50%;"></div> -->
-    <div id="layout" style="width: 80%; height: 720px; "></div>
+    <div id="layout" style="width: 90%; height: 800px; "></div>
     <script >
 
     var user = '<?php echo $this->user;?>';
@@ -31,7 +31,7 @@
                   '<div class="w2ui-buttons" style="float: right;" >'+
                   '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
                   '</div>'},
-                { type: 'main', size: 700, style: pstyle, content: '<div id="chart" style= float :center"></div>' },
+                { type: 'main', size: 800, style: pstyle, content: '<div id="vis" style= float :center"></div>' },
                 { type: 'bottom', size: 50, style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
             '<button class="w2ui-btn w2ui-btn-green" name="save" onclick="saveEmotion()">Enregistrer</button>'+
           '</div>' }
@@ -82,8 +82,19 @@
     }
 
     setTimeout(function(){
+      d3.xml("../svg/carto.svg").mimeType("image/svg+xml").get(function(error, xml) {
+  if (error) throw error;
+	var importedNode = document.importNode(xml.documentElement, true);
+	d3.select("div#vis").attr("id","svg-container")
+	  .each(function() {
+	    this.appendChild(importedNode);
+	  })
+	  // inside of our d3.xml callback, call another function
+	  // that styles individual paths inside of our imported svg
+	  // styleImportedSVG()
+});
     // d3.select(chart).style("height", "700px");
-    addScript('../js/sequences.js');
+    addScript('../js/carto.js');
     }, 100);
     </script>
 
