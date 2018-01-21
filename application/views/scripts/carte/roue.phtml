@@ -42,8 +42,13 @@
     function saveEmotion(){
       console.log("save emotion;");
       var json = {};
-      for (var key in selectedEmotion) {
-        json[key] = selectedEmotion[key].data;
+        //old code for D3 wheel
+      // for (var key in selectedEmotion) {
+      //   json[key] = selectedEmotion[key].data;
+      // }
+      for(var i = 0; i < selectedEmotion.length; i++)
+	    {
+        json[selectedEmotion[i].substr(0,selectedEmotion[i].length-1)] = selectedEmotion[i].substr(selectedEmotion[i].length-1);
       }
       var dt ={'emotions' : json};
       saveRepD3(dt);
@@ -86,6 +91,7 @@
   if (error) throw error;
 	var importedNode = document.importNode(xml.documentElement, true);
 	d3.select("div#vis").attr("id","svg-container")
+    // .attr("transform", "translate( 0," +(parseInt(document.getElementById("layout_layout_panel_main").style.height,10)-623) / 2 + ")")
 	  .each(function() {
 	    this.appendChild(importedNode);
 	  })

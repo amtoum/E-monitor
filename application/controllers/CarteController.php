@@ -128,7 +128,7 @@ class CarteController extends Zend_Controller_Action
         
         
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
-        $this->idDocEvalRoot = $this->s->dbD->ajouter(array("titre"=>"évaluationsD3"));
+        $this->idDocEvalRoot = $this->s->dbD->ajouter(array("titre"=>"évaluationsSVG"));
         
         //enregistre l'émotion évaluée
         if($this->_getParam('emo')){
@@ -140,23 +140,23 @@ class CarteController extends Zend_Controller_Action
         if($this->_getParam('emotions')){
             $data = $this->_getParam('emotions');
             //enregistre chaque émotion
-            $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation roue émotion","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
-            foreach ($data as $emo) {
-                $this->saveRepEmoD3($emo,$idDocEval);
+            $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation carte émotion","parent"=>$this->idDocEvalRoot));
+            foreach ($data as $emo=>$value) {
+                $this->saveRepEmoD3($emo,$value,$idDocEval);
             }
             $this->view->message = "Emotions enregistrées.";
         }
        
     }
-    function saveRepEmoD3($emo,$idDocEval){
-        $idTag = $this->s->dbT->ajouter(array("code"=>$emo["emotion"]));
+    function saveRepEmoD3($emo,$value,$idDocEval){
+        $idTag = $this->s->dbT->ajouter(array("code"=>$emo));
         //enregistre la réponse à la question par l'utilistaeur
-        $intensite = preg_replace('/[^0-9]/', '', $emo["name"]);
+        // $intensite = preg_replace('/[^0-9]/', '', $emo["name"]);
         $idRapRep = $this->s->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
             ,"src_id"=>$idTag,"src_obj"=>"tag"
             ,"pre_id"=>$idDocEval,"pre_obj"=>"doc"
             ,"dst_id"=>$this->idDocEvalRoot,"dst_obj"=>"doc"
-            ,"niveau"=>$intensite
+            ,"niveau"=>$value
         ),false);
     }
 
