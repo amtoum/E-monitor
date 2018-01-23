@@ -144,6 +144,9 @@ class CarteController extends Zend_Controller_Action
             foreach ($data as $emo=>$value) {
                 $this->saveRepEmoD3($emo,$value,$idDocEval);
             }
+            //récupérer le jour de la semaine en français
+            // setlocale(LC_TIME, "fr_FR");
+            // echo strftime(" in French %A and");
             $this->view->message = "Emotions enregistrées.";
         }
        

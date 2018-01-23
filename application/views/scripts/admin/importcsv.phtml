@@ -104,7 +104,7 @@
             { id: 'groupe', text: 'Groupes'},
             { id: 'formation', text: 'Formations'},
             //TODO: put back contrôle
-            // { id: 'controle', text: 'Contrôle'}
+            { id: 'controle', text: 'Contrôle'}
         ],
         onClick: function (event) {
             //création du nested layout
@@ -145,11 +145,17 @@
                 break;
                 case 'formation':
                 case 'groupe':
-                // case 'controle':
                     w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Partie '+
                                                             event.target+' à remplir plus tard</div>');
                     var json = {"type" : event.target};
                     getDataGroupeFormation(json);
+                break;
+                case 'controle' :
+                    var nlContent = '<div class="w2ui-field">'+
+                                        '<label>Multi-Select:</label>'+
+                                        '<div> <input id="enum"> </div>'+
+                                    '</div>';    
+                    w2ui['nestedLayout'].content('main',nlContent);
                 break;
             }
         }

@@ -56,6 +56,10 @@ var dir = loc.substring(0, loc.lastIndexOf('/'));
 //     // })
 // }
 
+// $("#layer2").load(function(){
+// 	$('.loader').fadeOut();
+// });
+
 function modif (id){
 	console.log('clicked !!');
 	var carre = document.getElementById(id);
