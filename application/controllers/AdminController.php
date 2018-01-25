@@ -187,6 +187,7 @@ class AdminController extends Zend_Controller_Action {
     }
 
     public function savejsonintodbAction(){
+        //TODO: changer la date de naissance (nait) pour que ça marche au fil des années
         $this->initInstance();
 
         $this->s = new Flux_Site($this->idBase);
@@ -216,7 +217,7 @@ class AdminController extends Zend_Controller_Action {
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
                     "nait" => "2017-09-01", "niveau" => $idFormationExi)) ;
                     $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
-                    "src_id"=>$idEtudiantExi, "src_obj"=>"etudiant",
+                    "src_id"=>$idEtudiantUti, "src_obj"=>"etudiant",
                         "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
                         "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
                         "valeur"=>"2017-09-01"));

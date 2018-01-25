@@ -21,13 +21,15 @@
     <script >
       
     var user = '<?php echo $this->user;?>';
+    var formation = '<?php echo $this->formation;?>';
     $(function () {
         var pstyle = ' color: #000000; border: 1px solid #dfdfdf; padding: 5px; ';
         $('#layout').w2layout({
             name: 'layout',
             panels: [
-                { type: 'top', size:140, style: pstyle, content: '<div style="float: left; font-size:40px;">Espace Etudiant '+
+                { type: 'top', size:200, style: pstyle, content: '<div style="float: left; font-size:40px;">Espace Etudiant '+
                   '<br>Connecté en tant que : '+ user+
+                  '<br>Formation suivie : '+ formation+
                   '</div>'+
                   '<div class="w2ui-buttons" style="float: right;" >'+
                   '<button class="w2ui-btn w2ui-btn-grey" style="font-size:40px;" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+

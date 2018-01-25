@@ -330,6 +330,30 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
             ->order("e.nom");        
         $result = $this->fetchAll($query);
         return $result->toArray(); 
-    }      
+    }    
+    
+    /**
+     * Récupère la formation d'un étudiant
+     *      SELECT nom FROM `flux_exi` INNER JOIN flux_rapport on exi_id = pre_id WHERE `src_id` = 47 AND `src_obj` LIKE 'etudiant'
+     * @param int $utiId
+     * 
+     * @return string
+     */
+    //TODO: récupérer la formation de l'année courante
+    public function getFormationById($utiId){
+        // $subquery = $this->
+        $query = $this->select()
+                    ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+                    ->from( array("e" => "flux_exi"), array('nom') )  
+                    ->joinInner(array('r' => 'flux_rapport'),
+                        'e.exi_id = r.pre_id')                     
+                    ->where( "r.src_id = ? AND r.src_obj LIKE 'etudiant'", $utiId );
+        $rows = $this->fetchAll($query);        
+        if($rows->count()>0)$result=$rows[0]->nom; else $result=false;
+        
+        
+        return $result;
+        
+    }
     
 }

@@ -3,7 +3,7 @@
 	<head>
 		<!-- merci à https://gist.github.com/nbremer/21746a9668ffdf6d8242#file-radarchart-js -->
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
-		<title><?php echo $this->titre;?></title>
+		<title>Espace Administrateur</title>
 
 		<!-- CSS -->
 	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
@@ -36,21 +36,21 @@
     var pstyle = 'background-color: #323948; border: 1px solid #dfdfdf; padding: 5px;';
 
     if(w2ui['layoutPrincipal'])w2ui['layoutPrincipal'].destroy();		
-            $('#layoutPrincipal').w2layout({
-                name: 'layoutPrincipal',
-                padding: 2,
-                panels: [
-                    { type: 'top', size: 70, resizable: false, style: pstyle, content:'<div style="float: left;">Espace Administrateur '+
-                        '<br>Connecté en tant que : '+ user +
-                        '</div>'+
-                        '<div class="w2ui-buttons" style="float: right;" >'+
-                        '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
-                        '</div>'},
-                    { type: 'left', size: 200, style: pstyle, content: 'left' },
-                    { type: 'main', style: pstyle, content: 
-                    '<div id="nestedLayout" style="padding: 10px">Selectionner une catégorie dans la barre latérale</div>' }
-            ]
-        });
+    $('#layoutPrincipal').w2layout({
+        name: 'layoutPrincipal',
+        padding: 2,
+        panels: [
+            { type: 'top', size: 70, resizable: false, style: pstyle, content:'<div style="float: left;">Espace Administrateur '+
+                '<br>Connecté en tant que : '+ user +
+                '</div>'+
+                '<div class="w2ui-buttons" style="float: right;" >'+
+                '<button class="w2ui-btn w2ui-btn-grey" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
+                '</div>'},
+            { type: 'left', size: 200, style: pstyle, content: 'left' },
+            { type: 'main', style: pstyle, content: 
+            '<div id="nestedLayout" style="padding: 10px">Selectionner une catégorie dans la barre latérale</div>' }
+    ]
+    });
     
     function save () { 
         console.log("***************save************"); 
@@ -66,9 +66,7 @@
             panels: [
                 { type: 'main', size: 200, style: pstyle, content: '<div id="grid" style="width: 100%; height: 400px; overflow: visible;"></div>' },
                 { type: 'bottom', style: pstyle, content: 
-                    '<div class="w2ui-page page-0">'+
-                        '	<div id="testChart"></div>'+
-                        '</div>'+
+                    
                         '<div class="w2ui-buttons">'+
                         // '<input id="clickMe" type="button" value="clickme" onclick="save();" />'+
                         '   <button class="w2ui-btn" name="reset">Annuler</button>'+
@@ -103,7 +101,7 @@
             { id: 'enseignant', text: 'Enseignants'},
             { id: 'groupe', text: 'Groupes'},
             { id: 'formation', text: 'Formations'},
-            //TODO: put back contrôle
+            
             { id: 'controle', text: 'Contrôle'}
         ],
         onClick: function (event) {
@@ -152,10 +150,24 @@
                 break;
                 case 'controle' :
                     var nlContent = '<div class="w2ui-field">'+
-                                        '<label>Multi-Select:</label>'+
-                                        '<div> <input id="enum"> </div>'+
-                                    '</div>';    
+                                        '<label>Jours de saisie autorisés :  </label>'+
+                                        '<div> <input id="enumJours"> </div>'+
+                                    '</div>'+
+                                    '<script>'+
+                                    'var jours = [\'dimanche\',\'lundi\',\'mardi\',\'mercredi\',\'jeudi\',\'vendredi\',\'samedi\'];'+
+                                        '$(\'#enumJours\').w2field(\'enum\', { '+
+                                        'items: jours,'+
+                                        'openOnFocus: true,'+
+                                        'selected: [{ id: 0, text: \'lundi\' }]'+
+                                       '});';    
+                //  var jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
                     w2ui['nestedLayout'].content('main',nlContent);
+                // $('#enumJours').w2field('enum', { 
+                //     items: jours,
+                //     openOnFocus: true,
+                //     selected: [{ id: 0, text: 'lundi' }]
+                // });
+                $('#enumJours').w2field().set({ id: 0, text: 'lundi' });
                 break;
             }
         }

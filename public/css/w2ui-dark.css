@@ -1000,14 +1000,14 @@ button.w2ui-btn-small:focus:before {
   float: left;
   margin-top: 7px;
   margin-bottom: 3px;
-  width: 120px;
+  width: auto;
   padding: 0px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: right;
   min-height: 20px;
-  color: #666;
+  color: #c0c8d5;
 }
 .w2ui-field > div {
   /* do not include width */

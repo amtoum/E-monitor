@@ -73,13 +73,22 @@ class CarteController extends Zend_Controller_Action
     public function roueAction(){
         $this->initInstance();
         
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+        $this->s->dbu = new Model_DbTable_Flux_Uti($this->s->db);
         // $this->view->data =  $this->_getParam('data', $dt);
         // $this->view->w =  $this->_getParam('w', 0);
         // $this->view->h =  $this->_getParam('h', 0);
         // $this->view->langue =  $this->_getParam('langue', "fr");
         // $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
-        if ($_SESSION["user"])
-        $this->view->user =  $this->_getParam('user', $_SESSION["user"] );
+        if ($_SESSION["user"]){
+            $utiId = $this->s->dbu->existe(array('login'=>$_SESSION["user"]));
+            $formation = $this->s->dbE->getFormationById($utiId);
+            $this->view->formation = $this->_getParam('formation', $formation );
+            $infoExi = $this->s->dbE->findByUtiID($utiId);
+            $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
+            $this->view->user =  $this->_getParam('user', $nomPrenom );
+        }
     }
 
     public function saverepquestAction(){
@@ -124,7 +133,7 @@ class CarteController extends Zend_Controller_Action
         $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
         $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
         $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
-        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
         
         
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
@@ -139,10 +148,13 @@ class CarteController extends Zend_Controller_Action
         //enregistre toutes les émotions de la roue d3
         if($this->_getParam('emotions')){
             $data = $this->_getParam('emotions');
+            
+            
+            // $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation carte émotion","parent"=>$this->idDocEvalRoot));
+            
             //enregistre chaque émotion
-            $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation carte émotion","parent"=>$this->idDocEvalRoot));
             foreach ($data as $emo=>$value) {
-                $this->saveRepEmoD3($emo,$value,$idDocEval);
+                $this->saveRepEmoD3($emo,$value);
             }
             //récupérer le jour de la semaine en français
             // setlocale(LC_TIME, "fr_FR");
@@ -151,14 +163,14 @@ class CarteController extends Zend_Controller_Action
         }
        
     }
-    function saveRepEmoD3($emo,$value,$idDocEval){
+    function saveRepEmoD3($emo,$value){
         $idTag = $this->s->dbT->ajouter(array("code"=>$emo));
         //enregistre la réponse à la question par l'utilistaeur
         // $intensite = preg_replace('/[^0-9]/', '', $emo["name"]);
         $idRapRep = $this->s->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
             ,"src_id"=>$idTag,"src_obj"=>"tag"
-            ,"pre_id"=>$idDocEval,"pre_obj"=>"doc"
-            ,"dst_id"=>$this->idDocEvalRoot,"dst_obj"=>"doc"
+            ,"pre_id"=>$this->idDocEvalRoot,"pre_obj"=>"doc"
+            ,"dst_id"=>$this->s->dbU->existe(array("login" => $_SESSION["user"])),"dst_obj"=>"uti"
             ,"niveau"=>$value
         ),false);
     }
