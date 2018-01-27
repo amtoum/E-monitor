@@ -151,27 +151,6 @@ class CarteController extends Zend_Controller_Action
         }
         $this->view->message = $checkSave[1];
 
-        // //enregistre l'émotion évaluée
-        // if($this->_getParam('emo')){
-        //     $this->saveRepEmo($this->_getParam('emo'),$this->idDocEvalRoot);
-        //     $this->view->message = "Emotion enregistrée.";
-        // }
-        
-        //enregistre toutes les émotions de la roue d3
-        if($this->_getParam('emotions')){
-            $data = $this->_getParam('emotions');
-            
-            
-            // $idDocEval = $this->s->dbD->ajouter(array("titre"=>"Evaluation carte émotion","parent"=>$this->idDocEvalRoot));
-            
-            //enregistre chaque émotion
-            foreach ($data as $emo=>$value) {
-                $this->saveRepEmoD3($emo,$value);
-            }
-            
-           
-            // $this->view->message = "Emotions enregistrées.";
-        }
        
     }
     function saveRepEmoD3($emo,$value){
@@ -238,8 +217,12 @@ class CarteController extends Zend_Controller_Action
         
         //récupérer dernière date de saisie
         $utiId = $this->s->dbU->existe(array("login" => $_SESSION["user"]));
-        $lastEntry = new DateTime($this->s->dbR->getTimeMostRecentEntryByUtiId($utiId));
-        $jour2 = strftime("%A",$lastEntry->getTimeStamp());
+        $lastEntry = $this->s->dbR->getTimeMostRecentEntryByUtiId($utiId);
+        $jour2 = "";
+        if ($lastEntry != 0){
+            $lastEntry = new DateTime($lastentry);
+            $jour2 = strftime("%A",$lastEntry->getTimeStamp());
+        }
         if($jour2 == $jour && $lastEntry > $debutDemiJ && $lastEntry < $finDemiJ  )
             return array(false, "Saisie déjà faite pour cette demie-journée.\nReviens à la prochaine demie-journée pour enregistrer tes émotions.\nVoir l'aide pour plus d'informations.");
 

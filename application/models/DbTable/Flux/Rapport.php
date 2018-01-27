@@ -291,7 +291,11 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     ->order("f.maj DESC")
                     ->limit(1,0);
         $result = $this->fetchAll($query);//->toArray();
-        return $result[0]->maj;
+        if ($result->count()>0)
+            return $result[0]->maj;
+        else 
+            return 0;
+        
     }
     
  

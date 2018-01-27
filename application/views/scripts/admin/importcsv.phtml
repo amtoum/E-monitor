@@ -207,11 +207,11 @@
             toolbarReload   : false
         }, 
 	    columns: [
-	    	{ field: 'nom', caption: 'Nom', size: '30%'},
-	    	{ field: 'prenom', caption: 'Prenom', size: '30%'},
-	    	{ field: 'login', caption: 'Login', size: '30%'},
-            { field: 'groupe', caption: 'Groupe', size: '30%'},
-            { field: 'formation', caption: 'Formation', size: '30%'},
+	    	{ field: 'nom', caption: 'Nom', size: '30%',editable: {type: 'text'}},
+	    	{ field: 'prenom', caption: 'Prenom', size: '30%',editable: {type: 'text'}},
+	    	{ field: 'login', caption: 'Login', size: '30%',editable: {type: 'text'}},
+            { field: 'groupe', caption: 'Groupe', size: '30%',editable: {type: 'text'}},
+            { field: 'formation', caption: 'Formation', size: '30%',editable: {type: 'text'}},
 	    ],
 	    records : <?php if($this->resJSON) echo $this->resJSON; else echo "{}" ?>
 	};
@@ -315,7 +315,7 @@
                         columns: [
                             { field: 'nom', caption: 'Libellé', size: '30%'},
                             { field: 'nait', caption: 'Date début', size: '30%'},
-                            { field: 'mort', caption: 'Date Fin', size: '30%'},
+                            { field: 'mort', caption: 'Date Fin', size: '30%',editable: {type: 'text'}},
                         ],
                         // records : jsonavecrecid,
                     };
