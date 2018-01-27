@@ -134,16 +134,28 @@ class CarteController extends Zend_Controller_Action
         $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
         $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
         $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
         
         
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
         $this->idDocEvalRoot = $this->s->dbD->ajouter(array("titre"=>"évaluationsSVG"));
         
-        //enregistre l'émotion évaluée
-        if($this->_getParam('emo')){
-            $this->saveRepEmo($this->_getParam('emo'),$this->idDocEvalRoot);
-            $this->view->message = "Emotion enregistrée.";
+        $checkSave = $this->autoriserSave();
+        if ($checkSave[0] && $this->_getParam('emotions')){
+            $data = $this->_getParam('emotions');
+            
+            //enregistre chaque émotion
+            foreach ($data as $emo=>$value) {
+                $this->saveRepEmoD3($emo,$value);
+            }
         }
+        $this->view->message = $checkSave[1];
+
+        // //enregistre l'émotion évaluée
+        // if($this->_getParam('emo')){
+        //     $this->saveRepEmo($this->_getParam('emo'),$this->idDocEvalRoot);
+        //     $this->view->message = "Emotion enregistrée.";
+        // }
         
         //enregistre toutes les émotions de la roue d3
         if($this->_getParam('emotions')){
@@ -156,10 +168,9 @@ class CarteController extends Zend_Controller_Action
             foreach ($data as $emo=>$value) {
                 $this->saveRepEmoD3($emo,$value);
             }
-            //récupérer le jour de la semaine en français
-            // setlocale(LC_TIME, "fr_FR");
-            // echo strftime(" in French %A and");
-            $this->view->message = "Emotions enregistrées.";
+            
+           
+            // $this->view->message = "Emotions enregistrées.";
         }
        
     }
@@ -184,6 +195,55 @@ class CarteController extends Zend_Controller_Action
             ,"dst_id"=>$this->idDocEvalRoot,"dst_obj"=>"doc"
             ,"niveau"=>$emo["value"]
         ),false);
+    }
+
+    function autoriserSave(){
+        //récupérer le jour de la semaine en français
+        setlocale(LC_TIME, "fr_FR");
+        
+        //récupérer jours de saisie autorisés
+        $dansJours = false;
+        $joursSaisie = $this->s->dbA->findByCode("joursSaisie");
+        $joursSaisie = explode(";",$joursSaisie[0]["desc"]);
+        // check si dans les jours de saisie autorisés
+        $jour = strftime("%A");
+        if (in_array($jour,$joursSaisie))
+            $dansJours = true;
+            
+            // echo strftime(" in French %A and");
+            $heure =  strftime("%H:%M");
+            $dansTemps = false;
+            //récupérer temps de saisie autorisés
+            $tempsSaisie = $this->s->dbA->findByCode("tempsSaisie");
+            $tempsSaisie = explode(";",$tempsSaisie[0]["desc"]);
+            $debutDemiJ;
+            $finDemiJ;
+            // check si dans les temps de saisie autorisés
+            foreach($tempsSaisie as $partieTempsSaisie){
+                $limite = explode(",",$partieTempsSaisie);
+                $date1 = DateTime::createFromFormat('H:i', $heure);
+                $date2 = DateTime::createFromFormat('H:i', $limite[0]);
+                $date3 = DateTime::createFromFormat('H:i', $limite[1]);
+                if ($date1 > $date2 && $date1 < $date3){
+                    $dansTemps = true;
+                    $debutDemiJ = $date2;
+                    $finDemiJ = $date3;
+                }
+            }
+            
+        if (!$dansJours) 
+            return array(false, "Jour de saisie non autorisé.\nReviens lundi matin pour enregistrer tes émotions du jour.\nVoir l'aide pour plus d'informations.");
+        else if (!$dansTemps)    
+            return array(false, "Saisie non autorisée.\nReviens à la prochaine demie-journée pour enregistrer tes émotions.\nVoir l'aide pour plus d'informations.");
+        
+        //récupérer dernière date de saisie
+        $utiId = $this->s->dbU->existe(array("login" => $_SESSION["user"]));
+        $lastEntry = new DateTime($this->s->dbR->getTimeMostRecentEntryByUtiId($utiId));
+        $jour2 = strftime("%A",$lastEntry->getTimeStamp());
+        if($jour2 == $jour && $lastEntry > $debutDemiJ && $lastEntry < $finDemiJ  )
+            return array(false, "Saisie déjà faite pour cette demie-journée.\nReviens à la prochaine demie-journée pour enregistrer tes émotions.\nVoir l'aide pour plus d'informations.");
+
+        return array(true, "Emotions enregistrées.");
     }
     
 

@@ -27,12 +27,13 @@
         $('#layout').w2layout({
             name: 'layout',
             panels: [
-                { type: 'top', size:200, style: pstyle, content: '<div style="float: left; font-size:40px;">Espace Etudiant '+
-                  '<br>Connecté en tant que : '+ user+
-                  '<br>Formation suivie : '+ formation+
+                { type: 'top', size:200, style: pstyle, content: '<div style="float: left; font-size:40px;">'+
+                  user+
+                  '<br>'+ formation+
                   '</div>'+
                   '<div class="w2ui-buttons" style="float: right;" >'+
-                  '<button class="w2ui-btn w2ui-btn-grey" style="font-size:40px;" name="deconnexion" onclick="disconnect()">Déconnexion</button>'+
+                  '<button class="w2ui-btn w2ui-btn-grey" style="font-size:40px;" name="deconnexion" onclick="disconnect()">Déconnexion</button><br>'+
+                  '<button class="w2ui-btn w2ui-btn-grey" style="font-size:40px;float:right;" name="aide" onclick="aide()">Aide</button>'+
                   '</div>'},
                 { type: 'main',  style: pstyle, content: '<div id="vis" align="center" valign="middle"></div>' },
                 { type: 'bottom', style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
@@ -54,7 +55,12 @@
         json[selectedEmotion[i].substr(0,selectedEmotion[i].length-1)] = selectedEmotion[i].substr(selectedEmotion[i].length-1);
       }
       var dt ={'emotions' : json};
+      if (selectedEmotion.length == 0){
+        alert("Merci de sélectionner tes émotions sur la carte.")
+      }
+      else{
       saveRepD3(dt);
+      }
     }
 
     function saveRepD3(dt) {
@@ -75,11 +81,18 @@
               // var message = "<?php echo $this->message ?>";
               saveResult = result;
               // alert (message);
-              alert("Emotions enregistrées :)"+result["message"]);
+              alert(result["message"]);
 		        }
 			});
     }
     
+    function aide(){
+      alert("Bienvenue dans E-monitor.\n"+
+            "Dans cette application tu peux exprimer tes émotions auprès de tes enseignants pour un meilleur suivi pédagogique.\n"+
+            "La saisie est possible 2 fois par jour de 9h à 14h et de 14h à 19h, du lundi au vendredi.\n"+
+            "Pour exprmier ce que tu ressens durant les cours, il suffit de sélectionner une ou deux émotions sur la carte en cliquant sur l\'intensité qui correspond.");
+    }
+
     function disconnect() {
 			window.location.href="../auth/deconnexion";
 		}

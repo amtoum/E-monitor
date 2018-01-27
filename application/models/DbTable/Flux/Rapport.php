@@ -259,7 +259,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     
         return $this->fetchAll($query)->toArray(); 
     }
-    	/**
+    /**
      * Recherche une entrée Flux_rapport avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -274,6 +274,24 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     ->where( "f.maj = ?", $maj );
 
         return $this->fetchAll($query)->toArray(); 
+    }
+
+    /**
+     * récupère la date de la saisie d'émotion la plus récente
+     *      SELECT maj from flux_rapport where dst_obj= "uti" and dst_id=47 Group by rapport_id ORDER BY maj DESC LIMIT 1
+     * @param string $utiId
+     * @return datetime
+     */
+    public function getTimeMostRecentEntryByUtiId($utiId){
+        $query = $this->select()
+                    ->from(array("f"=>"flux_rapport",array("maj")))
+                    ->where('f.dst_obj = ?',"uti")
+                    ->where('f.dst_id = ?',$utiId)
+                    ->group("f.rapport_id")
+                    ->order("f.maj DESC")
+                    ->limit(1,0);
+        $result = $this->fetchAll($query);//->toArray();
+        return $result[0]->maj;
     }
     
  
