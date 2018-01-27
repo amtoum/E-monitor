@@ -210,8 +210,8 @@ class AdminController extends Zend_Controller_Action {
                 $jsonrecu = $this->_getParam('resJSON');
                 foreach ($jsonrecu as $ligne){
                     //si l'étudiant n'existe pas dans flux_uti
-                    //TODO: flux_uti et obligation d'utilisation de l'email comme login ou le nom d'utilisateur
-                    $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "etudiant"));
+                    
+                    $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "etudiant"));
                     $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
                     $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
@@ -233,7 +233,7 @@ class AdminController extends Zend_Controller_Action {
                 foreach ($jsonrecu as $ligne){
                     //si l'étudiant n'existe pas dans flux_uti
                     
-                    $idEnseignantUti = $this->s->dbU->ajouter(array("login" => $ligne["email"], "role" => "enseignant"));
+                    $idEnseignantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "enseignant"));
                     $idEnseignantExi = $this->s->dbE->ajouter(array("uti_id" => $idEnseignantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
                     $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
