@@ -70,7 +70,7 @@ class CarteController extends Zend_Controller_Action
         $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
     }  
     
-    public function roueAction(){
+    public function emotionsAction(){
         $this->initInstance();
         
         $this->s = new Flux_Site($this->idBase);

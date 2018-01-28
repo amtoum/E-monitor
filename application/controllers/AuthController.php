@@ -99,7 +99,7 @@ class AuthController extends Zend_Controller_Action
 					$this->view->role = "ETUDIANT";
 					//TODO: redirect vers version finale de la roue
 					// $this->redirect('/carte/roueemotion');
-					$this->redirect('/carte/roue');
+					$this->redirect('/carte/emotions');
 
 
 
