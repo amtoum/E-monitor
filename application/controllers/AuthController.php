@@ -82,86 +82,42 @@ class AuthController extends Zend_Controller_Action
 		
 		//met en sessions les informations de l'existence
 		$dbUti = new Model_DbTable_Flux_Uti($s->db);
-		$id = $dbUti->ajouter(array("login"=>$this->view->user),true,false);
-		$role = $dbUti->getRoleById($id) ;
-		$auth = phpCAS::checkAuthentication();
-		if (!$auth) {
-			$_SESSION["service_id_auth"] = $GLOBALS["TSFE"]->id;
-			header('Location: ' . t3lib_div::locationHeaderUrl($this->pi_getPageLink($idPageAuth, "", array("action" => "auth"))));
-			exit;
-		} else {
-			$_SESSION["user"] = phpCAS::getUser();
-			$_SESSION["role"] = $role;
-		}
-		switch ($role) {
-			case "etudiant" :
-				$this->view->role = "ETUDIANT";
-				//TODO: redirect vers version finale de la roue
-				// $this->redirect('/carte/roueemotion');
-				$this->redirect('/carte/roue');
+		$id = $dbUti->existe(array("login"=>$this->view->user),true,false);
+		if($id != false){
+			$role = $dbUti->getRoleById($id) ;
+			$auth = phpCAS::checkAuthentication();
+			if (!$auth) {
+				$_SESSION["service_id_auth"] = $GLOBALS["TSFE"]->id;
+				header('Location: ' . t3lib_div::locationHeaderUrl($this->pi_getPageLink($idPageAuth, "", array("action" => "auth"))));
+				exit;
+			} else {
+				$_SESSION["user"] = phpCAS::getUser();
+				$_SESSION["role"] = $role;
+			}
+			switch ($role) {
+				case "etudiant" :
+					$this->view->role = "ETUDIANT";
+					//TODO: redirect vers version finale de la roue
+					// $this->redirect('/carte/roueemotion');
+					$this->redirect('/carte/roue');
 
 
 
-				break;
-			case "enseignant" :
-				$this->view->role = "ENSEIGNANT";
-				break;
-			case "admin" :
-				$this->view->role = "ADMIN";
-				$this->redirect('/admin/importcsv');
-				// $ssExi = new Zend_Session_Namespace('uti');
-				// if($this->_getParam('idBase'))$ssExi->dbNom = $this->_getParam('idBase');	
-				// $s = new Flux_Site($ssExi->dbNom);
+					break;
+				case "enseignant" :
+					$this->view->role = "ENSEIGNANT";
+					break;
+				case "admin" :
+					$this->view->role = "ADMIN";
+					$this->redirect('/admin/importcsv');
+					
+
+					break;
+			
+			
 				
-				// if($this->_getParam('redir', 0)){
-				// 	$ssExi->redir='/'.$this->_getParam('redir', 0);
-				// }
-				
-				// 	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
-				// // $auth = Zend_Auth::getInstance();
-				// // $auth->clearIdentity();
-		
-
-				// 	$adapter = new Zend_Auth_Adapter_DbTable(
-				// 		$s->db,
-				// 		'flux_uti',
-				// 		'login',
-				// 		'mdp'
-				// 		);		                
-				// 	$adapter->setIdentity($this->view->user);
-				// 	$adapter->setCredential("");
-					
-				// 	// Tentative d'authentification et stockage du résultat
-					
-					
-				// 	$auth   = Zend_Auth::getInstance();
-				// 	$result = $auth->authenticate($adapter);
-					
-				// 	//TODO: modifier après création de session et login CAS
-				// 	//si le login correspond à un admin
-				// 	if ($result->isValid() && $loginForm->getValue('login')=="admin") {
-				// 		$this->_helper->FlashMessenger('Successful Login');
-				// 		$this->redirect('/admin/importcsv');
-				// 		return;
-				// 	}
-				// 	//si le login correspond à un utilisateur
-				// 	else if ($result->isValid()) {
-				// 		$this->_helper->FlashMessenger('Successful Login');
-				// 		$this->redirect('/carte/roueemotion');
-				// 		return;
-				// 	}
-				// 	else {
-				// 		$this->view->message = 'Login failed';
-				// 	}
-
-				break;
-		
-		
-		
-		//redirige l'utilisteur si besoin
-		// if($redir)
-		// 	$this->_redirect($redir."?idUti=".$rs[0]["uti_id"]);	
-		
+			
+			}
 		}
 	}
 
