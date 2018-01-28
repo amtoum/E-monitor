@@ -220,7 +220,7 @@ class CarteController extends Zend_Controller_Action
         $lastEntry = $this->s->dbR->getTimeMostRecentEntryByUtiId($utiId);
         $jour2 = "";
         if ($lastEntry != 0){
-            $lastEntry = new DateTime($lastentry);
+            $lastEntry = new DateTime($lastEntry);
             $jour2 = strftime("%A",$lastEntry->getTimeStamp());
         }
         if($jour2 == $jour && $lastEntry > $debutDemiJ && $lastEntry < $finDemiJ  )
