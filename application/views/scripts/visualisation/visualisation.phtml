@@ -1,3 +1,389 @@
-<?php
-    echo "Bienvenue dans l'espace visualisation"
-?>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><?php echo $this->titre;?></title>
+  <script src="../js/d3.v4.min.js"></script>
+  <script src="../js/d3-scale-chromatic.v1.min.js"></script>  
+  <script src="../js/d3-legend.min.js"></script>  
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/w2ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+      
+  <style>
+    body { margin:0 auto;}
+    h1,h2,p {
+      margin:0px;
+    }
+    svg {
+	  margin-left:auto; margin-right:auto; display:block;
+    }
+    
+    .axis {
+	  font: 10px sans-serif;
+		}
+    
+    .axis path,
+	  .axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+    .tooltip {
+	  position: absolute;
+	  width: 300px;
+	  height: 35px;
+	  pointer-events: none;
+	}
+    
+  </style>
+</head>
+
+<body>
+  <div id='titresViz'>
+	  <h1 align="center"><?php echo $this->titre;?></h1>
+	  <h2 align="center"><?php echo $this->soustitre;?></h2>
+	  <p align="center" id="major">-</p>
+  </div>
+  <p align="center" id="viz">-</p>
+  <script>
+	//affiche le message de chargement
+    // w2popup.open({
+    //     width: 500,
+    //     height: 300,
+    //     title: 'Chargement des données',
+    //     body: '<div class="w2ui-centered"></div>',
+    //     showMax: false,
+    //     showClose: false
+    // });
+	// w2popup.lock("Merci de patienter...", true);	
+  
+	//merci à http://bl.ocks.org/f94f/5554bf0a6874a64f46deacf3448ee5c8    
+    var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
+	var formatJour = d3.timeFormat("%d %B %Y"), formatAn = d3.timeFormat("%Y"), formatMois = d3.timeFormat("%Y %B");
+	var formatTemps;
+	
+	
+	/*
+	var color = d3.scaleLinear()
+	    .range(["#51D0D7", "#31B5BB"]);
+	var color = d3.scaleOrdinal(d3.schemeCategory20);
+	*/
+	var color = d3.interpolateRainbow;//d3.interpolateRdYlBu;
+	var colorInit = "";
+	
+	function tempsToDate(temps, type) {
+	  	var dRef, arrTemps = temps.split('-')
+	  	formatTemps = arrTemps.length;
+	  	if(arrTemps.length==3){
+			//vérifie la présence d'heure
+			var arrTemps2 = arrTemps[2].split(' ');
+			if(arrTemps2.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2], 0, 0, 0];
+			else{
+				var arrTemps3 = arrTemps2[1].split(':');
+				formatTemps += arrTemps3.length;				
+        			if(arrTemps3.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps2[1], 0, 0];
+        			if(arrTemps3.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], 0];		  	 
+        			if(arrTemps3.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], arrTemps3[2]];		  	 
+			}
+		}
+	  	if(arrTemps.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, 1, 0, 0, 0];
+		if(arrTemps.length==1) dRef = [arrTemps[0], 0, 1, 0, 0, 0];
+		if(type=="utc") return Date.UTC(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);
+		else return new Date(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);	
+	}
+	function dateToTemps(dt) {
+		if(formatTemps==6) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
+		if(formatTemps==5) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(),0);
+		if(formatTemps==4) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(),0, 0);
+		if(formatTemps==3) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(),0,0,0);
+		if(formatTemps==2) return Date.UTC(dt.getFullYear(), dt.getMonth(), 1,0,0,0);
+		if(formatTemps==1) return Date.UTC(dt.getFullYear(), 0, 1,0,0,0);	    			
+	}
+	    
+	//d3.csv('<?php echo $this->urlData;?>', function(err, data){
+	//&dates[]=1158589136&dates[]=1461471206
+	//var url = 'http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y';
+	//var url = 'http://localhost/jdc/public/flux/ensuprefr?q=getTagHisto&idMonade=2&idUti=1&idActi=3&idParent=1&for=stream&query=34591&dates[]=946681200&dates[]=1285884000';
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y-%m-%d&dates[]=1483228800&dates[]=1489415262";
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&arrTags[]=ecosysteminfo";
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
+	//var url = "http://localhost/jdc/public/flux/isidore?q=getHistoDiscipline&req=%C3%A9cosyst%C3%A8me";
+	var url = '<?php echo $this->urlData;?>';
+	d3.json(url, function(err, data){
+
+		
+	  if(err) console.log(err);
+	  //console.log(d)
+	  
+	  //création des datas de références
+	  refTotal['total']=0;
+	  data.forEach(function(dt){
+		  //transforme le temps en date
+		  var dRef = tempsToDate(dt.temps, 'utc');		  
+		  var k = dt.key+'-'+dRef;		  
+		  refData[k] = dt;
+		  //cumul les clefs
+		  if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
+		  //cumul les dates
+		  if(!refTotal[dt.temps]){			  
+			  refTotal[dt.temps]=Math.trunc(dt.value);
+		  }else{
+			  refTotal[dt.temps] += Math.trunc(dt.value);
+		  }
+		  refTotal['total'] += Math.trunc(dt.value);
+		  
+		  //cumul les tags
+		  if(!refTag[dt.key]){			  
+			  refTag[dt.key]={"type":dt.type,"desc":dt.desc,"value":Math.trunc(dt.value)};
+		  }else{
+			  refTag[dt.key].value += Math.trunc(dt.value);
+		  }
+		  
+	  });
+	  //création des couleurs et du tableau de la légende	  
+	  var sc = d3.scaleLinear().range([0, 1]).domain([0, refKey.length+1]);
+	  refKey.forEach(function(r,i){
+		  //var numColor = stringToBinary(dt.type);
+		  //numColor = 1/(numColor)*1000;
+		  //var numColor = 1/(refKey.length+1);	  
+		  nbTotal += refTag[r].value;
+		  var numColor = sc(i);	  
+		  refTag[r].color=color(numColor);
+		  legData.colors.push(refTag[r].color);		  
+		  legData.labels.push(refTag[r].type);		  
+		  //legData.labels.push(refTag[r].type+' : '+refTag[r].value);		  
+	  });
+	  //création des données liées
+	  var nested_data = d3.nest()
+			.key(function(d) { return d.temps; })
+			.entries(data);
+		/*vérification du tableau
+		for (i = 0; i < nested_data.length-1; i++) { 
+			var n1 = nested_data[i].values;			
+			var n2 = nested_data[i+1].values;
+			console.log(i+" : "+n1[0].temps+" = "+n1.length);
+			if(n1.length != n2.length){
+				console.log(i+" : "+n1.length+' != '+n2.length);
+				for (j = 0; j < n1.length; j++) {
+					if(n1[j] && n2[j]){
+						if(n1[j].type!=n2[j].type)
+							console.log(i+" / "+j+" : "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+						else
+							console.log(i+" / "+j+" OK "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+					}else
+						console.log(i+" / "+j+" KO "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+						
+				} 
+					
+			}			
+		}
+		*/
+	  //console.log(nested_data);
+	  
+	  var mqpdata = nested_data.map(function(d){
+	    var obj = {
+	      utc: tempsToDate(d.key, 'utc'),
+	      dt: tempsToDate(d.key),	      
+	    }
+	    
+	    d.values.forEach(function(v){
+	      obj[v.key] = v.value;
+	      obj.k = v.key+'-'+obj.utc;		  	      
+	      //console.log(d.value)
+	    })
+	    
+	    return obj;
+	  })
+	  
+	  buildStreamGraph(mqpdata);
+
+	  buildLegend();
+
+	  //supprime le message de chargement	
+	  w2popup.unlock();
+	  w2popup.close();
+	  
+	})
+
+function buildStreamGraph(mqpdata) {
+	var data = mqpdata;
+	  	
+	var stack = d3.stack()
+	    .keys(refKey)
+	    .order(d3.stackOrderNone)
+	    .offset(d3.stackOffsetWiggle);
+	
+	var series = stack(data);
+	var divTitreHeight = document.getElementById('titresViz').clientHeight;	
+	var margin = {top: 20, right: 30, bottom: 30, left: 30};
+	var width = window.innerWidth - margin.left - margin.right;
+	var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
+	var extData = d3.extent(data, function(d){ 
+		return d.utc; 
+		});
+	var y = d3.scaleTime()
+	    .domain([extData[1],extData[0]])
+	    .range([margin.top, height-margin.bottom]);	
+	  
+	var x = d3.scaleLinear()
+	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
+	    .range([width/2, margin.left+margin.right]);
+	console.log(x.domain());
+
+	// setup axis
+	var yAxis = d3.axisLeft(y);
+	var xAxis = d3.axisBottom(x);
+	
+	
+	var area = d3.area()
+		.y(function(d) { 
+			//console.info('in area function', d); 
+			return y(d.data.utc); 
+			})
+		.x0(function(d) { 
+			var xTest = x(d[0]);
+			return xTest; 
+			})
+		.x1(function(d) { 
+			var xTest = x(d[1]);
+			return xTest; 
+			})
+		.curve(d3.curveBasis);
+	
+	
+	  var tooltip = d3.select("body").append("div")
+		.attr("class", "tooltip");
+	  
+	var svg = d3.select("#viz").append("svg")
+	    .attr("id", "svgGlobal")
+	    .attr("width", width)
+	    .attr("height", height);
+	
+	svg.selectAll("path")
+	    .data(series)
+	    .enter().append("path")
+	    .attr("d", area)
+	    .style("fill", function(d) { 
+		    return refTag[d.key].color; 
+		    //return color(Math.random()); 
+		    })	    
+	    .on('mouseover', function(d){
+	    		colorInit = d3.select(this).style("fill");      
+		    d3.select(this).style('fill',d3.rgb(colorInit).brighter());
+			d3.select("#major").text(refTag[d.key].type);
+			tooltip.transition()
+               .duration(700)
+               .style("opacity", 1);
+	    })
+	    .on('mousemove', function(d){      
+			//console.log(d);
+			//récupère les datas liés à la position de la souris
+		    	var mouse = d3.mouse(this);		    		
+		    	var dRef = dateToTemps(y.invert(mouse[1]));	    
+			var k = d.key+'-'+dRef;
+			var dt = refData[k];
+			//récupère les datas liés au path
+			//dt = refData[d[d.index].data.k];
+			var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
+			var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
+			tooltip.html(refTag[d.key].type+"<br/>"
+						+"Total = "+refTag[d.key].value+" = "+pcTot.toFixed(2)+" %<br/>"
+						+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcRef.toFixed(2)+" %<br/>")
+	               .style("left", (d3.event.pageX + 5) + "px")
+	               .style("top", (d3.event.pageY - 28) + "px");
+	    })
+	    .on('mouseout', function(d){      
+	      	d3.select(this).style('fill',d3.rgb(colorInit));
+	      	d3.select("#major").text("-");
+			tooltip.transition()
+	               .duration(500)
+	               .style("opacity", 0);
+		})
+	//construction de l'axe y
+	svg.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", "translate(" + 100 + "," + 0 + ")")
+            .call(yAxis);    
+	/*construction de l'axe des X
+	svg.append("g")
+		.attr("id","axeXBas")
+	    .attr("class", "axis axis--x")
+	    .attr("transform", "translate(" + 0 + "," + (height-margin.bottom+10) + ")")
+	    .call(xAxis);    
+    */
+}
+
+	function buildLegend(){
+
+
+		//calcul le nombre de légende
+		var bbG = document.getElementById("svgGlobal").getBBox();
+		//var bbA = document.getElementById("axeXBas").getBBox();
+		//var nbItem = Math.ceil((bbG.height-bbA.height)/20)-1;
+		var nbItem = Math.ceil((bbG.height-10)/20)-1;
+		var nbLeg = Math.ceil(legData.labels.length/nbItem);
+		var arrLeg = [];
+		
+		for (var i = 1; i <= nbLeg; i++) {
+			//filtre les données à afficher
+			var lbls = legData.labels.filter(function(x,num) {
+				   return num < i*nbItem && num > nbItem*(i-1);
+			});
+			var clrs = legData.colors.filter(function(x,num) {
+				   return num < i*nbItem && num > nbItem*(i-1);
+			});
+			var ordinal = d3.scaleOrdinal()
+			  .domain(lbls)
+			  .range(clrs);
+	
+			var svg = d3.select("svg");
+
+			var xTrans = 120;
+			if(i>1){
+				for (var j = 2; j <= i; j++) {
+					var bb = document.getElementById("legend"+(j-1)).getBBox();				
+					xTrans += bb.width+20;
+				}
+			}
+				
+	
+			svg.append("g")
+			  .attr("class", "legendOrdinal"+i)
+			  .attr("id", "legend"+i)
+			  .attr("transform", "translate("+xTrans+",30)");
+	
+			arrLeg[i] = d3.legendColor()
+			  //d3 symbol creates a path-string, for example
+			  //"M0,-8.059274488676564L9.306048591020996,
+			  //8.059274488676564 -9.306048591020996,8.059274488676564Z"
+			  //.shape("path", d3.symbol().type(d3.symbolTriangle).size(150)())		  
+			  .shape('circle')
+			  .shapePadding(0)
+			  //use cellFilter to hide the "e" cell
+			  //.cellFilter(function(d){ return d.label !== "e" })
+			  .scale(ordinal)
+			  //.title(legData.labels.length+' <?php echo $this->legendetitre;?> : '+nbTotal)
+			  ;
+			  if(i==1){
+				  arrLeg[i].title(legData.labels.length+' <?php echo $this->legendetitre;?>')
+				  .titleWidth(100)					  
+			  }
+	
+			svg.select(".legendOrdinal"+i)
+			  .call(arrLeg[i]);	
+		}
+		
+	}
+    function stringToBinary(s){
+        var c = 0;
+	    	for (var i=0; i<s.length; i++) {
+	    		c += s.charCodeAt(i).toString(2);
+	    }
+		return c;    
+    }
+    
+    
+  </script>
+</body>
+</html>
