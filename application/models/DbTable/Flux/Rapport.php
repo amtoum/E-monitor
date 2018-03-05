@@ -297,6 +297,40 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
             return 0;
         
     }
+
+    /**
+     * Retourne les émotions saisies
+     *
+     * @param boolean $dateDebut
+     * @param boolean $dateFin
+     * @param integer $idFormation
+     * @return void
+     */
+    public function getEmotions($dateDebut=false, $dateFin=false,$idFormation=0)
+    {
+        $query = $this->select()
+                    ->from(array("f"=>"flux_rapport"), 
+                            array("key"=>"t.code","value"=>new Zend_Db_Expr("AVG(f.niveau)"),
+                            "date"=> new Zend_Db_Expr("
+                            CASE 
+                            WHEN TIME(f.maj) BETWEEN '09:00:00' AND '14:00:00' THEN concat(DATE(f.maj),' 09:00:00')
+                            WHEN TIME(f.maj) BETWEEN '14:00:00' AND '19:00:00' THEN concat(DATE(f.maj),' 14:00:00')
+                            END
+                            ")))
+                    ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+                    ->joinInner(array('t' => 'flux_tag'),
+                        't.tag_id = f.src_id',array())//,array('tag_id', 'code')
+                    ->where( "f.dst_obj = 'uti'")
+                    ->where( "f.pre_obj = 'doc'")
+                    ->where( "f.src_obj = 'tag'")
+                    ->group(array("code","date"))
+                    ->order(array("code","date"));
+        $result = $this->fetchAll($query);//->toArray();
+        if ($result->count()>0)
+            return $result->toArray();
+        else 
+            return 0;
+    }
     
  
 }

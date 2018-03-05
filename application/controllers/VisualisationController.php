@@ -3,8 +3,24 @@
 class VisualisationController extends Zend_Controller_Action
 {
 
+    var $idBase = "iutparishebddem";
+
     public function visualisationAction(){
         $this->initInstance();
+
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+
+        $arrayRes = $this->s->dbR->getEmotions();
+
+        $resultJSON = json_encode($arrayRes, JSON_PRETTY_PRINT);
+        
+        $this->view->resultJSON = $resultJSON;
+
     }
 
     function initInstance($action=""){
