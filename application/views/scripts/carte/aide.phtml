@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>E-monitor - Aide</title>
+        <script src="../js/jquery.min.js" charset="utf-8"></script>
+		<script src="../js/jquery.blast.min.js"></script>
+        <script src="../js/w2ui.js" charset="utf-8"></script>
+        <link rel="stylesheet" href="../css/opensans.css">
+        <link rel="stylesheet" href="../css/sequences.css"/>
+        <link rel="stylesheet" href="../css/w2ui-dark.css" />
+        <link rel="stylesheet" href="../font/font-awesome/font-awesome.css" />
+    </head>
+    <body>
+        <div class="loader"></div>
+        <div id="layout" style="position: absolute; top: 10px; left: 10px; bottom: 10px; right: 10px;"></div>
+        <script >
+            var texte = '<div id="text" style="float: left; font-size:40px;">'+
+            "<h2>Aide : </h2>"+
+            "Bienvenue dans E-monitor.<br>"+
+            "Dans cette application vous pouvez exprimer vos émotions auprès de vos enseignants pour un meilleur suivi pédagogique.<br>"+
+            "La saisie est possible 2 fois par jour de 9h à 14h et de 14h à 19h, du lundi au vendredi.<br>"+
+            "Pour exprimer ce que vous ressentez durant les cours, il suffit de sélectionner une ou deux émotions sur la carte en cliquant sur l\'intensité qui correspond."+
+            "<h2>Politique de confidentialité des données :</h2>"+
+            "Cette application est proposée par l’Université Paris Descartes, afin d’identifier les difficultés des étudiants au cours d’une formation, pour leur proposer de l’aide, et d’adapter d’une année sur l’autre la formation en fonction des problèmes observés. Pour cela elle utilise des données à caractère personnel vous concernant, traitée avec votre consentement. "+
+            "<h4>Quelles données privées sont utilisées par cette application ?</h4>"+
+            "Nous conservons vos noms, login à l’ENT Paris Descartes, adresse mail institutionnelle (@etu.parisdescartes.fr), l’intitulé de votre formation et les émotions que vous choisissez chaque jour."+
+            "<h4>Qui peut y avoir accès ?</h4>"+
+            "Le chef de département, le responsable de formation ont accès à ces seules données et peuvent lever l’anonymat. Les enseignants ont seulement accès aux résultats anonymisés. Le développeur a accès à l’ensemble des données."+
+            "<h4>Combien de temps gardez-vous les données ?</h4>"+
+            "Vos données sont anonymisées à chaque fin d’année scolaire. En revanche, pour permettre les comparaisons entre les années les données statistiques sont exportées et conservées 3 ans."+
+            "<h4>Comment accéder à mes données ou demander leur suppression ?</h4>"+
+            "Vous pouvez demander accès à vos données au chef de département, qui peut également, si vous le souhaitez, les rectifier, les effacer de la base, ou en limiter le traitement.<br>"+
+            "Vous pouvez contacter le Correspondant informatique et libertés de l’Université (cil@parisdescartes.fr) pour toute question, ou saisir la CNIL d’une réclamation.";
+                '</div>';
+            $(function () {
+                var pstyle = ' color: #000000; border: 0px solid #dfdfdf; padding: 5px; ';
+                $('#layout').w2layout({
+                    name: 'layout',
+                    panels: [
+                        { type: 'main',  style: pstyle, content: texte },
+                        { type: 'bottom', style: pstyle, content: '<div class="w2ui-buttons" align="center">'+
+                    '<button class="w2ui-btn w2ui-btn-gray" style="font-size:40px;" name="retour" onclick="retour()">Retour</button>'+
+                '</div>' }
+                    ]
+                });
+            });
+
+            function retour(){
+                window.location.href="../carte/emotions";
+            }
+        </script>
+    </body>
+</html>

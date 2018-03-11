@@ -80,6 +80,7 @@
 		    style: 'border: 0px; padding: 0px;',
 		    formHTML: 
 		        '<div class="w2ui-buttons">'+
+                '    <button class="w2ui-btn w2ui-btn-gray" name="retour">Retour</button>'+
 		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
 		        '</div>',
 		    fields: [],
@@ -87,6 +88,9 @@
 		    actions: {
 		        "save": function () { 
 		        		saveDataToDB(); 
+			    },
+                "retour": function () { 
+                    window.location.href="../admin/importcsv";
 			    },
 		    }
 		};
@@ -249,7 +253,8 @@
     function saveDataToDB(){
         console.log("will save data to db now !!");
         if (<?php if($this->selection) echo "1"; else echo "0" ?>)
-            var dt = {'resJSON':<?=($this->resJSON)?$this->resJSON:0?>,'type':<?php echo '\''.$this->selection.'\'';?>};
+            var dt = {'type':<?php echo '\''.$this->selection.'\'';?>,'resJSON':<?=($this->resJSON)?$this->resJSON:0?>};
+        console.log("dt :"+dt);    
         passJSONviaAjax(dt);
     }
 		

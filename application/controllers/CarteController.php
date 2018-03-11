@@ -229,6 +229,9 @@ class CarteController extends Zend_Controller_Action
         return array(true, "Emotions enregistrées.");
     }
     
+    public function aideAction(){
+        //aide
+    }
 
     //pour l'authentification
     function initInstance($action=""){
