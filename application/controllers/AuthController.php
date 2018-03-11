@@ -235,7 +235,7 @@ session_destroy();
     	header('Content-Type: text/html; charset=utf-8');
     	
     	// Enable debugging
-    	phpCAS::setDebug("../../phpCAS.log");
+    	phpCAS::setDebug("../tmp/phpCAS.log");
     	// Enable verbose error messages. Disable in production!
     	phpCAS::setVerbose(true);
     	

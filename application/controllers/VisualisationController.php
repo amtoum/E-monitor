@@ -16,10 +16,45 @@ class VisualisationController extends Zend_Controller_Action
         $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
 
         $arrayRes = $this->s->dbR->getEmotions();
+        $arrayDate = array();
+        $arrayEmotions = array();
+        foreach ($arrayRes as $data) {
+            if (!in_array($data['date'],$arrayDate)){
+                array_push($arrayDate,$data['date']);
+            }
+            if (!in_array($data['key'],$arrayEmotions)){
+                array_push($arrayEmotions,$data['key']);
+            }
+        }
+        
+        $message = "";
+        //chercher si combinaisons emotions+date est dans le tableau ???
+        foreach ($arrayEmotions as $emotion) {
+            foreach ($arrayDate as $date ) {
+                $test = array();
+                $test = array_intersect_key($arrayRes, array(array("key" => $emotion,"value" => "", "date" => $date)));
+                if(empty($test)){
+                    $message .= "pour emotion : ".$emotion." et date : ".$date." il faut ajouter 0 <br>";
+                }
+                else {
+                    $message .= "emotion : ".$emotion." et date : ".$date." présente <br>";
+                }
 
-        $resultJSON = json_encode($arrayRes, JSON_PRETTY_PRINT);
+
+            }
+        }
+
+
+        $arrayFin = array();
+
+
+
+        $resultJSON = json_encode($arrayRes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         
         $this->view->resultJSON = $resultJSON;
+        $this->view->dateJSON = json_encode($arrayDate, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->view->emotionsJSON = json_encode($arrayEmotions, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->view->message = $message;
 
     }
 

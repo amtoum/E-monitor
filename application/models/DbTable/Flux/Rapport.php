@@ -323,6 +323,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     ->where( "f.dst_obj = 'uti'")
                     ->where( "f.pre_obj = 'doc'")
                     ->where( "f.src_obj = 'tag'")
+                    ->where("TIME(f.maj) BETWEEN '09:00:00' AND '19:00:00'")
                     ->group(array("code","date"))
                     ->order(array("code","date"));
         $result = $this->fetchAll($query);//->toArray();
