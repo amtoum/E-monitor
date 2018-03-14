@@ -5,6 +5,17 @@ class VisualisationController extends Zend_Controller_Action
 
     var $idBase = "iutparishebddem";
 
+    public function cmp($a, $b)
+    {
+        $a = date('Y-m-d H:i:s', strtotime($a));
+        $b = date('Y-m-d H:i:s', strtotime($b));
+
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a < $b) ? -1 : 1;
+    }
+
     public function visualisationAction(){
         $this->initInstance();
 
@@ -26,24 +37,49 @@ class VisualisationController extends Zend_Controller_Action
                 array_push($arrayEmotions,$data['key']);
             }
         }
+        usort($arrayDate, array($this,"cmp"));
         
+
+
         $message = "";
-        //chercher si combinaisons emotions+date est dans le tableau ???
-        foreach ($arrayEmotions as $emotion) {
-            foreach ($arrayDate as $date ) {
-                $test = array();
-                $test = array_intersect_key($arrayRes, array(array("key" => $emotion,"value" => "", "date" => $date)));
-                if(empty($test)){
-                    $message .= "pour emotion : ".$emotion." et date : ".$date." il faut ajouter 0 <br>";
-                }
-                else {
-                    $message .= "emotion : ".$emotion." et date : ".$date." présente <br>";
-                }
+        // //chercher si combinaisons emotions+date est dans le tableau ???
+        // foreach ($arrayEmotions as $emotion) {
+        //     foreach ($arrayDate as $date ) {
+        //         $test = array();
+        //         $test = array_intersect_key($arrayRes, array(array("key" => $emotion,"value" => "", "date" => $date)));
+        //         if(empty($test)){
+        //             $message .= "pour emotion : ".$emotion." et date : ".$date." il faut ajouter 0 <br>";
+        //         }
+        //         else {
+        //             $message .= "emotion : ".$emotion." et date : ".$date." présente <br>";
+        //         }
 
 
+        //     }
+        // }
+        
+        $emStock = $arrayRes[0]["key"];
+        $i = $j = 0;
+
+        //ajouter les dates manquantes dans arrayRes
+        while (($i < count($arrayRes) || $j < count($arrayDate))){
+            if ($emStock != $arrayRes[$i]["key"]){
+                if ( $j == count($arrayDate)){
+                    $emStock = $arrayRes[$i]["key"];
+                    $j = 0;
+                }
+            }
+            $zeb = $arrayRes[$i]["date"]; 
+            if ($arrayRes[$i]["date"] != $arrayDate[$j] ){
+                array_splice($arrayRes, $i, 0, array(array("key" => $emStock, "value"=>"0", "date" => $arrayDate[$j])));
+                $i++;
+                $j++;
+            }
+            else{
+                $i++;
+                $j++;
             }
         }
-
 
         $arrayFin = array();
 
