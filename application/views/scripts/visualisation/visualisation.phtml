@@ -32,16 +32,42 @@ button {
 <head>
   <meta charset="utf-8">
   <title><?php echo $this->titre;?></title>
-  <script src="../js/d3.v2.min.js"></script>
+  <!-- <script src="../js/d3.v2.min.js"></script> -->
   <script src="../js/date_fns.min.js"></script>
-  <!-- <script src="../js/d3.v4.min.js"></script>
+  <script src="../js/d3.v4.min.js"></script>
   <script src="../js/d3-scale-chromatic.v1.min.js"></script>  
-  <script src="../js/d3-legend.min.js"></script>   -->
+  <script src="../js/d3-legend.min.js"></script>  
   <script src="../js/jquery.min.js"></script>
   <script src="../js/w2ui.js"></script>
   <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
       
-
+  <style>
+    body { margin:0 auto;}
+    h1,h2,p {
+      margin:0px;
+    }
+    svg {
+	  margin-left:auto; margin-right:auto; display:block;
+    }
+    
+    .axis {
+	  font: 10px sans-serif;
+		}
+    
+    .axis path,
+	  .axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+    .tooltip {
+	  position: absolute;
+	  width: 300px;
+	  height: 35px;
+	  pointer-events: none;
+	}
+    
+  </style>
 </head>
 
 <body>
@@ -62,190 +88,196 @@ button {
 	  <h2 align="center"><?php echo $this->soustitre;?></h2>
 	  <p align="center" id="major">-</p>
   </div>
+  <p align="center" id="viz">-</p>
   <div class="chart">
 </div>
 
   <script>
-	// var data = <?=Zend_Json::encode($this->resultJSON)?>;
+var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
+  	function tempsToDate(temps, type) {
+	  	var dRef, arrTemps = temps.split('-')
+	  	formatTemps = arrTemps.length;
+	  	if(arrTemps.length==3){
+			//vérifie la présence d'heure
+			var arrTemps2 = arrTemps[2].split(' ');
+			if(arrTemps2.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2], 0, 0, 0];
+			else{
+				var arrTemps3 = arrTemps2[1].split(':');
+				formatTemps += arrTemps3.length;				
+        			if(arrTemps3.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps2[1], 0, 0];
+        			if(arrTemps3.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], 0];		  	 
+        			if(arrTemps3.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], arrTemps3[2]];		  	 
+			}
+		}
+	  	if(arrTemps.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, 1, 0, 0, 0];
+		if(arrTemps.length==1) dRef = [arrTemps[0], 0, 1, 0, 0, 0];
+		if(type=="utc") return Date.UTC(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);
+		else return new Date(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);	
+	}
+
+
+	var keys = <?php echo $this->emotionsJSON;?>;
   var datearray = [];
-  var format = d3.time.format("%Y-%m-%d %H:%M:%S");
+  var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
   var data = <?php echo $this->resultJSON;?>;
   data.forEach(function(d){
+    d.key = d.key;
     d.value = +d.value;
-    d.date = format.parse(d.date);
+    d.date = parse(d.date);
   });
-    // if (color == "blue") {
-  colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#DD1BC6", "#8AD724"];
-  // }
-  // else if (color == "pink") {
-  //   colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
-  // }
-  // else if (color == "orange") {
-  //   colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"];
-  // }
-  strokecolor = colorrange[0];
 
+	  refTotal['total']=0;
+	  data.forEach(function(dt){
+		  //transforme le temps en date
+		  var dRef = dt.date;		  
+		  var k = dt.key+'-'+dRef;		  
+		  refData[k] = dt;
+		  //cumul les clefs
+		  if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
+		  //cumul les dates
+		  if(!refTotal[dt.temps]){			  
+			  refTotal[dt.temps]=Math.trunc(dt.value);
+		  }else{
+			  refTotal[dt.temps] += Math.trunc(dt.value);
+		  }
+		  refTotal['total'] += Math.trunc(dt.value);
+		  
+		  //cumul les tags
+		  if(!refTag[dt.key]){			  
+			  refTag[dt.key]={"type":dt.type,"desc":dt.desc,"value":Math.trunc(dt.value)};
+		  }else{
+			  refTag[dt.key].value += Math.trunc(dt.value);
+		  }
+		  
+	  });
+	  //création des couleurs et du tableau de la légende	  
+	  var sc = d3.scaleLinear().range([0, 1]).domain([0, refKey.length+1]);
+	  refKey.forEach(function(r,i){
+		  //var numColor = stringToBinary(dt.type);
+		  //numColor = 1/(numColor)*1000;
+		  //var numColor = 1/(refKey.length+1);	  
+		  nbTotal += refTag[r].value;
+		  var numColor = sc(i);	  
+		  refTag[r].color=d3.color(numColor);
+		  legData.colors.push(refTag[r].color);		  
+		  legData.labels.push(refTag[r].type);		  
+		  //legData.labels.push(refTag[r].type+' : '+refTag[r].value);		  
+	  });
 
-  var margin = {top: 20, right: 40, bottom: 30, left: 30};
-  var width = document.body.clientWidth - margin.left - margin.right;
-  var height = 400 - margin.top - margin.bottom;
-
-  var tooltip = d3.select("body")
-      .append("div")
-      .attr("class", "tip")
-      .style("position", "absolute")
-      .style("z-index", "20")
-      .style("visibility", "hidden")
-      .style("top", "30px")
-      .style("left", "55px");
-
-  var x = d3.time.scale()
-      .range([0, width]);
-
-  var y = d3.scale.linear()
-      .range([height-10, 0]);
-
-  var z = d3.scale.ordinal()
-      .range(colorrange);
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-      .ticks(d3.time.weeks);
-
-  var yAxis = d3.svg.axis()
-      .scale(y);
-
-  var yAxisr = d3.svg.axis()
-      .scale(y);
-
-  var stack = d3.layout.stack()
-      .offset("zero")
-      .values(function(d) { return d.values; })
-      .x(function(d) { return d.date; })
-      .y(function(d) { return d.value; });
-
-  var nest = d3.nest()
-      .key(function(d) { return d.key; });
-
-  var area = d3.svg.area()
-      .interpolate("cardinal")
-      .x(function(d) { return x(d.date); })
-      .y0(function(d) { return y(d.y0); })
-      .y1(function(d) { return y(d.y0 + d.y); });
-
-  var svg = d3.select(".chart").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // var graph = d3.csv(csvpath, function(data) {
-    // data.forEach(function(d) {
-    //   d.date = format.parse(d.date);
-    //   d.value = +d.value;
-    // });
-
-var layers = stack(nest.entries(data));
-
-x.domain(d3.extent(data, function(d) { return d.date; }));
-y.domain([0, d3.max(data, function(d) { return d.y0 + d.y; })]);
-
-svg.selectAll(".layer")
-    .data(layers)
-  .enter().append("path")
-    .attr("class", "layer")
-    .attr("d", function(d) { return area(d.values); })
-    .style("fill", function(d, i) { return z(i); });
-
-
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
-
-// svg.append("g")
-//     .attr("class", "y axis")
-//     .attr("transform", "translate(" + width + ", 0)")
-//     .call(yAxis.orient("right"));
-
-// svg.append("g")
-//     .attr("class", "y axis")
-//     .call(yAxis.orient("left"));
-
-svg.selectAll(".layer")
-  .attr("opacity", 1)
-  .on("mouseover", function(d, i) {
-    svg.selectAll(".layer").transition()
-    .duration(250)
-    .attr("opacity", function(d, j) {
-      return j != i ? 0.6 : 1;
-  })})
-
-  .on("mousemove", function(d, i) {
-    mousex = d3.mouse(this);
-    mousex = mousex[0];
-    var invertedx = x.invert(mousex);
-    var dateToCompare = new Date(invertedx);
-    console.log("datetocompare : "+dateToCompare);
-    invertedx = invertedx.getMonth() + invertedx.getDate()+ invertedx.getHours() + invertedx.getMinutes();
-    var selected = (d.values);
-    for (var k = 0; k < selected.length; k++) {
-      datearray[k] = selected[k].date
-      // datearray[k] = datearray[k].getMonth() + datearray[k].getDate() + datearray[k].getHours() + datearray[k].getMinutes();
+  var nested_data = d3.nest ()
+        .key(function(d) {return d.date;})
+        .entries(data);
+  var mqpdata = nested_data.map(function(d){
+    var obj = {
+      utc: d.key,
+      dt: d.key,	      
     }
-    var foundDate = dateFns.closestTo(dateToCompare,datearray);
-    console.log("date trouvée : "+foundDate);
-    var foundDateIndex = dateFns.closestIndexTo(dateToCompare,datearray);
     
-    // mousedate = datearray.indexOf(invertedx);
-    pro = d.values[foundDateIndex].value;
-    ladate = d.values[foundDateIndex].date;
-
-    // mousedate = datearray.indexOf(invertedx);
-    // pro = d.values[mousedate].value;
-    // ladate = d.values[mousedate].date;
-
-    d3.select(this)
-    .classed("hover", true)
-    .attr("stroke", strokecolor)
-    .attr("stroke-width", "0.5px"), 
-    tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "visible");
+    d.values.forEach(function(v){
+      obj[v.key] = v.value;
+      obj.k = v.key+'-'+obj.utc;		  	      
+      //console.log(d.value)
+    })
     
+    return obj;
   })
-  .on("mouseout", function(d, i) {
-   svg.selectAll(".layer")
-    .transition()
-    .duration(250)
-    .attr("opacity", "1");
-    d3.select(this)
-    .classed("hover", false)
-    .attr("stroke-width", "0px"), tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "hidden");
-})
-  
-var vertical = d3.select(".chart")
-      .append("div")
-      .attr("class", "remove")
-      .style("position", "absolute")
-      .style("z-index", "19")
-      .style("width", "1px")
-      .style("height", "380px")
-      .style("top", "10px")
-      .style("bottom", "30px")
-      .style("left", "0px")
-      .style("background", "#fff");
+  var data = mqpdata;var stack = d3.stack()
+	    .keys(keys)
+	    .order(d3.stackOrderNone)
+	    .offset(d3.stackOffsetWiggle);
+	
+	var series = stack(data);
+	var divTitreHeight = document.getElementById('titresViz').clientHeight;	
+	var margin = {top: 20, right: 30, bottom: 30, left: 30};
+	var width = window.innerWidth - margin.left - margin.right;
+	var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
+	var extData = d3.extent(data, function(d){ 
+		return new Date(d.utc); 
+		});
+	var y = d3.scaleTime()
+	    .domain([extData[1],extData[0]])
+	    .range([margin.top, height-margin.bottom]);	
+	  
+	var x = d3.scaleLinear()
+	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
+	    .range([width/2, margin.left+margin.right]);
+	console.log(x.domain());
 
-d3.select(".chart")
-    .on("mousemove", function(){  
-       mousex = d3.mouse(this);
-       mousex = mousex[0] + 5;
-       vertical.style("left", mousex + "px" )})
-    .on("mouseover", function(){  
-       mousex = d3.mouse(this);
-       mousex = mousex[0] + 5;
-       vertical.style("left", mousex + "px")});
-
-  // });
+	// setup axis
+	var yAxis = d3.axisLeft(y);
+	var xAxis = d3.axisBottom(x);
+	
+	
+	var area = d3.area()
+		.y(function(d) { 
+			//console.info('in area function', d); 
+      var yTest =y(new Date(d.data.utc));
+			return yTest; 
+			})
+		.x0(function(d) { 
+			var xTest = x(d[0]);
+			return xTest; 
+			})
+		.x1(function(d) { 
+			var xTest = x(d[1]);
+			return xTest; 
+			})
+		.curve(d3.curveBasis);
+	
+	
+	  var tooltip = d3.select("body").append("div")
+		.attr("class", "tooltip");
+	  
+	var svg = d3.select("#viz").append("svg")
+	    .attr("id", "svgGlobal")
+	    .attr("width", width)
+	    .attr("height", height);
+	
+	svg.selectAll("path")
+	    .data(series)
+	    .enter().append("path")
+	    .attr("d", area)
+	    .style("fill", function(d) { 
+		    return refTag[d.key].color; 
+		    //return color(Math.random()); 
+		    })	    
+	    .on('mouseover', function(d){
+	    		colorInit = d3.select(this).style("fill");      
+		    d3.select(this).style('fill',d3.rgb(colorInit).brighter());
+			d3.select("#major").text(refTag[d.key].type);
+			tooltip.transition()
+               .duration(700)
+               .style("opacity", 1);
+	    })
+	    .on('mousemove', function(d){      
+			//console.log(d);
+			//récupère les datas liés à la position de la souris
+		    	var mouse = d3.mouse(this);		    		
+		    	var dRef = dateToTemps(y.invert(mouse[1]));	    
+			var k = d.key+'-'+dRef;
+			var dt = refData[k];
+			//récupère les datas liés au path
+			//dt = refData[d[d.index].data.k];
+			var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
+			var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
+			tooltip.html(refTag[d.key].type+"<br/>"
+						+"Total = "+refTag[d.key].value+" = "+pcTot.toFixed(2)+" %<br/>"
+						+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcRef.toFixed(2)+" %<br/>")
+	               .style("left", (d3.event.pageX + 5) + "px")
+	               .style("top", (d3.event.pageY - 28) + "px");
+	    })
+	    .on('mouseout', function(d){      
+	      	d3.select(this).style('fill',d3.rgb(colorInit));
+	      	d3.select("#major").text("-");
+			tooltip.transition()
+	               .duration(500)
+	               .style("opacity", 0);
+		})
+	//construction de l'axe y
+	svg.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", "translate(" + 100 + "," + 0 + ")")
+            .call(yAxis);  
 
   </script>
 </body>
