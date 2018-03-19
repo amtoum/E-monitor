@@ -115,7 +115,8 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 		else return new Date(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);	
 	}
 
-
+	colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#DD1BC6", "#8AD724"];
+	strokecolor = colorrange[0];
 	var keys = <?php echo $this->emotionsJSON;?>;
   var datearray = [];
   var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
@@ -194,39 +195,48 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 	var extData = d3.extent(data, function(d){ 
 		return new Date(d.utc); 
 		});
-	var y = d3.scaleTime()
-	    .domain([extData[1],extData[0]])
+	var x = d3.scaleTime()
+	    .domain([extData[0],extData[1]])
 	    .range([margin.top, height-margin.bottom]);	
 	  
-	var x = d3.scaleLinear()
+	var y = d3.scaleLinear()
 	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
 	    .range([width/2, margin.left+margin.right]);
 	console.log(x.domain());
 
+	  var z = d3.scaleOrdinal()
+      .range(colorrange);
+
 	// setup axis
-	var yAxis = d3.axisLeft(y);
-	var xAxis = d3.axisBottom(x);
+	var xAxis = d3.axisLeft(y);
+	var yAxis = d3.axisBottom(x);
 	
 	
 	var area = d3.area()
-		.y(function(d) { 
+		.x(function(d) { 
 			//console.info('in area function', d); 
-      var yTest =y(new Date(d.data.utc));
+      var yTest =x(new Date(d.data.utc));
 			return yTest; 
 			})
-		.x0(function(d) { 
-			var xTest = x(d[0]);
+		.y0(function(d) { 
+			var xTest = y(d[0]);
 			return xTest; 
 			})
-		.x1(function(d) { 
-			var xTest = x(d[1]);
+		.y1(function(d) { 
+			var xTest = y(d[1]);
 			return xTest; 
 			})
 		.curve(d3.curveBasis);
 	
 	
-	  var tooltip = d3.select("body").append("div")
-		.attr("class", "tooltip");
+		var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "remove")
+    .style("position", "absolute")
+    .style("z-index", "20")
+    .style("visibility", "hidden")
+    .style("top", "30px")
+    .style("left", "55px");
 	  
 	var svg = d3.select("#viz").append("svg")
 	    .attr("id", "svgGlobal")
@@ -237,10 +247,7 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 	    .data(series)
 	    .enter().append("path")
 	    .attr("d", area)
-	    .style("fill", function(d) { 
-		    return refTag[d.key].color; 
-		    //return color(Math.random()); 
-		    })	    
+	    .style("fill", function(d, i) { return z(i); })
 	    .on('mouseover', function(d){
 	    		colorInit = d3.select(this).style("fill");      
 		    d3.select(this).style('fill',d3.rgb(colorInit).brighter());
@@ -249,35 +256,98 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
                .duration(700)
                .style("opacity", 1);
 	    })
-	    .on('mousemove', function(d){      
-			//console.log(d);
-			//récupère les datas liés à la position de la souris
-		    	var mouse = d3.mouse(this);		    		
-		    	var dRef = dateToTemps(y.invert(mouse[1]));	    
-			var k = d.key+'-'+dRef;
-			var dt = refData[k];
-			//récupère les datas liés au path
-			//dt = refData[d[d.index].data.k];
-			var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
-			var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
-			tooltip.html(refTag[d.key].type+"<br/>"
-						+"Total = "+refTag[d.key].value+" = "+pcTot.toFixed(2)+" %<br/>"
-						+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcRef.toFixed(2)+" %<br/>")
-	               .style("left", (d3.event.pageX + 5) + "px")
-	               .style("top", (d3.event.pageY - 28) + "px");
-	    })
-	    .on('mouseout', function(d){      
-	      	d3.select(this).style('fill',d3.rgb(colorInit));
-	      	d3.select("#major").text("-");
-			tooltip.transition()
-	               .duration(500)
-	               .style("opacity", 0);
-		})
+	    // .on('mousemove', function(d){      
+			// //console.log(d);
+			// //récupère les datas liés à la position de la souris
+		  //   	var mouse = d3.mouse(this);		    		
+		  //   	var dRef = dateToTemps(y.invert(mouse[1]));	    
+			// var k = d.key+'-'+dRef;
+			// var dt = refData[k];
+			// //récupère les datas liés au path
+			// //dt = refData[d[d.index].data.k];
+			// var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
+			// var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
+			// tooltip.html(refTag[d.key].type+"<br/>"
+			// 			+"Total = "+refTag[d.key].value+" = "+pcTot.toFixed(2)+" %<br/>"
+			// 			+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcRef.toFixed(2)+" %<br/>")
+	    //            .style("left", (d3.event.pageX + 5) + "px")
+	    //            .style("top", (d3.event.pageY - 28) + "px");
+	    // })
+			.on("mousemove", function(d, i) {
+        mousex = d3.mouse(this);
+        mousex = mousex[0];
+        var invertedx = x.invert(mousex);
+        var dateToCompare = new Date(invertedx);
+        // console.log("datetocompare : "+dateToCompare);
+        invertedx = invertedx.getMonth() + invertedx.getDate()+ invertedx.getHours() + invertedx.getMinutes();
+        // var selected = (d.values);
+        for (var k = 0; k < d.length; k++) {
+          datearray[k] = d[k].data.utc;
+          // datearray[k] = datearray[k].getMonth() + datearray[k].getDate() + datearray[k].getHours() + datearray[k].getMinutes();
+        }
+        var foundDate = dateFns.closestTo(dateToCompare,datearray);
+        // console.log("date trouvée : "+foundDate);
+        var foundDateIndex = dateFns.closestIndexTo(dateToCompare,datearray);
+        
+        // mousedate = datearray.indexOf(invertedx);
+        pro = d[foundDateIndex].data[d.key];
+        ladate = d[foundDateIndex].data.utc;
+
+        // mousedate = datearray.indexOf(invertedx);
+        // pro = d.values[mousedate].value;
+        // ladate = d.values[mousedate].date;
+
+        d3.select(this)
+        .classed("hover", true)
+        .attr("stroke", strokecolor)
+        .attr("stroke-width", "0.5px"), 
+        tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "visible");
+        
+      })
+			.on("mouseout", function(d, i) {
+				d3.select(this).style('fill',d3.rgb(colorInit));
+				svg.selectAll(".layer")
+					.transition()
+					.duration(250)
+					.attr("opacity", "1");
+					d3.select(this)
+					.classed("hover", false)
+					.attr("stroke-width", "0px"), tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "hidden");
+			})
+	  //   .on('mouseout', function(d){      
+	  //     	d3.select(this).style('fill',d3.rgb(colorInit));
+	  //     	d3.select("#major").text("-");
+		// 	tooltip.transition()
+	  //              .duration(500)
+	  //              .style("opacity", 0);
+		// })
 	//construction de l'axe y
 	svg.append("g")
             .attr("class", "axis axis--y")
-            .attr("transform", "translate(" + 100 + "," + 0 + ")")
+            .attr("transform", "translate(" + 0 + "," + 600 + ")")
             .call(yAxis);  
+
+	var vertical = d3.select("#viz")
+        .append("div")
+        .attr("class", "remove")
+        .style("position", "absolute")
+        .style("z-index", "19")
+        .style("width", "1px")
+        .style("height", height)
+        .style("top", "10px")
+        .style("bottom", "30px")
+        .style("left", "0px")
+        .style("background", "#fff");
+
+  d3.select("#viz")
+      .on("mousemove", function(){  
+         mousex = d3.mouse(this);
+         mousex = mousex[0] + 5;
+         vertical.style("left", mousex + "px" )})
+      .on("mouseover", function(){  
+         mousex = d3.mouse(this);
+         mousex = mousex[0] + 5;
+         vertical.style("left", mousex + "px")});
 
   </script>
 </body>
