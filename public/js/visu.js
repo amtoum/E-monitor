@@ -111,6 +111,9 @@ $(function () {
     
     $('#gridFormations').w2grid(gridFormations);
     $('#gridEmos').w2grid(gridEmos);
+
+    $('#gridFormations').w2grid().selectAll();
+    $('#gridEmos').w2grid().selectAll();
     
 });
 
