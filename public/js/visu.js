@@ -25,6 +25,12 @@ function getData() {
             // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
             // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
             console.log(result);
+            w2ui['layout2'].content('main',"<div id='titresViz'>"+
+                        "<p align='center' id='major'>-</p>"+
+                        "</div>"+
+                        "<p align='center' id='viz'>-</p>"+
+                        "<div class='chart'>"+
+                                    "</div>");
             if(JSON.parse(result["dateJSON"]).length > 1){
                 drawStream(JSON.parse(result["emotionsJSON"]), JSON.parse(result["resultJSON"]),true);
             }
