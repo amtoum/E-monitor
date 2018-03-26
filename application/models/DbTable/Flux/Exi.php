@@ -356,4 +356,21 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
         
     }
     
+    /**
+     * Récupère les formations de l'année
+     *      SELECT exi_id, nom FROM `flux_exi` WHERE data = 'formation' and nait = '2017-09-01'
+     * @param Datetime $date ('Y-m-d')
+     * 
+     * @return array
+     */
+    public function getFormationsAnnee($date){
+        // $subquery = $this->
+        $query = $this->select()
+                    ->from( array("e" => "flux_exi"), array('recid'=>'exi_id','nom') )  
+                    ->where('e.data = "formation"')
+                    ->where( "e.nait = ? ", $date );
+        $result = $this->fetchAll($query);        
+        return $result->toArray();
+    }
+
 }

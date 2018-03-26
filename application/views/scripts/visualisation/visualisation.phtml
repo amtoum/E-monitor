@@ -22,77 +22,65 @@ p {
   shape-rendering: crispEdges;
 }
 
-button {
-  position: absolute;
-  right: 50px;
-  top: 10px;
+
+.tooltip {
+	  position: absolute;
+	  width: 300px;
+	  height: 35px;
+	  pointer-events: none;
+	}
+
+	input {
+  display: inline-block;
+  float: right;
 }
 
 </style>
 <head>
   <meta charset="utf-8">
   <title><?php echo $this->titre;?></title>
-  <!-- <script src="../js/d3.v2.min.js"></script> -->
+  
   <script src="../js/date_fns.min.js"></script>
   <script src="../js/d3.v4.min.js"></script>
   <script src="../js/d3-scale-chromatic.v1.min.js"></script>  
   <script src="../js/d3-legend.min.js"></script>  
   <script src="../js/jquery.min.js"></script>
+  <!-- <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" /> -->
+	<link rel="stylesheet" type="text/css" href="../css/w2ui.min.css" />
   <script src="../js/w2ui.js"></script>
-  <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
       
-  <style>
-    body { margin:0 auto;}
-    h1,h2,p {
-      margin:0px;
-    }
-    svg {
-	  margin-left:auto; margin-right:auto; display:block;
-    }
-    
-    .axis {
-	  font: 10px sans-serif;
-		}
-    
-    .axis path,
-	  .axis line {
-	  fill: none;
-	  stroke: #000;
-	  shape-rendering: crispEdges;
-	}
-    .tooltip {
-	  position: absolute;
-	  width: 300px;
-	  height: 35px;
-	  pointer-events: none;
-	}
-    
-  </style>
+
 </head>
 
 <body>
-  <!-- <p>Résultat :<br></p>
-  <?php echo $this->resultJSON;?>
+	<script type="text/javascript">
+			var resultJSON = <?php echo $this->resultJSON;?>;
+			var emotionsJSON = <?php echo $this->emotionsJSON;?>;
+			var formations = <?php echo $this->formations;?>;
+			</script>
+	<script src="../js/visu.js"></script>
+	<div id="layout" style="position: absolute; top: 10px; left: 10px; bottom: 10px; right: 10px;"></div>
+
+
+
+  <!-- <?php echo $this->resultJSON;?>
   <br>
   <br>
   <?php echo $this->dateJSON;?>
   <br>
   <br>
-  <?php echo $this->emotionsJSON;?>
-  <br>
-  <br>
-  <?php echo $this->message;?> -->
+  <?php echo $this->emotionsJSON;?> -->
 
-  <div id='titresViz'>
+  <!-- <div id='titresViz'>
 	  <h1 align="center"><?php echo $this->titre;?></h1>
 	  <h2 align="center"><?php echo $this->soustitre;?></h2>
 	  <p align="center" id="major">-</p>
   </div>
   <p align="center" id="viz">-</p>
   <div class="chart">
-</div>
+</div> -->
 
-  <script>
+  <!-- <script>
 var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
   	function tempsToDate(temps, type) {
 	  	var dRef, arrTemps = temps.split('-')
@@ -154,15 +142,11 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 	  //création des couleurs et du tableau de la légende	  
 	  var sc = d3.scaleLinear().range([0, 1]).domain([0, refKey.length+1]);
 	  refKey.forEach(function(r,i){
-		  //var numColor = stringToBinary(dt.type);
-		  //numColor = 1/(numColor)*1000;
-		  //var numColor = 1/(refKey.length+1);	  
 		  nbTotal += refTag[r].value;
 		  var numColor = sc(i);	  
 		  refTag[r].color=d3.color(numColor);
 		  legData.colors.push(refTag[r].color);		  
 		  legData.labels.push(refTag[r].type);		  
-		  //legData.labels.push(refTag[r].type+' : '+refTag[r].value);		  
 	  });
 
   var nested_data = d3.nest ()
@@ -176,8 +160,7 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
     
     d.values.forEach(function(v){
       obj[v.key] = v.value;
-      obj.k = v.key+'-'+obj.utc;		  	      
-      //console.log(d.value)
+      		  	      
     })
     
     return obj;
@@ -202,7 +185,6 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 	var y = d3.scaleLinear()
 	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
 	    .range([width/2, margin.left+margin.right]);
-	console.log(x.domain());
 
 	  var z = d3.scaleOrdinal()
       .range(colorrange);
@@ -214,7 +196,6 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 	
 	var area = d3.area()
 		.x(function(d) { 
-			//console.info('in area function', d); 
       var yTest =x(new Date(d.data.utc));
 			return yTest; 
 			})
@@ -256,46 +237,21 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
                .duration(700)
                .style("opacity", 1);
 	    })
-	    // .on('mousemove', function(d){      
-			// //console.log(d);
-			// //récupère les datas liés à la position de la souris
-		  //   	var mouse = d3.mouse(this);		    		
-		  //   	var dRef = dateToTemps(y.invert(mouse[1]));	    
-			// var k = d.key+'-'+dRef;
-			// var dt = refData[k];
-			// //récupère les datas liés au path
-			// //dt = refData[d[d.index].data.k];
-			// var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
-			// var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
-			// tooltip.html(refTag[d.key].type+"<br/>"
-			// 			+"Total = "+refTag[d.key].value+" = "+pcTot.toFixed(2)+" %<br/>"
-			// 			+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcRef.toFixed(2)+" %<br/>")
-	    //            .style("left", (d3.event.pageX + 5) + "px")
-	    //            .style("top", (d3.event.pageY - 28) + "px");
-	    // })
 			.on("mousemove", function(d, i) {
         mousex = d3.mouse(this);
         mousex = mousex[0];
         var invertedx = x.invert(mousex);
         var dateToCompare = new Date(invertedx);
-        // console.log("datetocompare : "+dateToCompare);
         invertedx = invertedx.getMonth() + invertedx.getDate()+ invertedx.getHours() + invertedx.getMinutes();
-        // var selected = (d.values);
         for (var k = 0; k < d.length; k++) {
           datearray[k] = d[k].data.utc;
-          // datearray[k] = datearray[k].getMonth() + datearray[k].getDate() + datearray[k].getHours() + datearray[k].getMinutes();
         }
         var foundDate = dateFns.closestTo(dateToCompare,datearray);
-        // console.log("date trouvée : "+foundDate);
+        
         var foundDateIndex = dateFns.closestIndexTo(dateToCompare,datearray);
         
-        // mousedate = datearray.indexOf(invertedx);
         pro = d[foundDateIndex].data[d.key];
         ladate = d[foundDateIndex].data.utc;
-
-        // mousedate = datearray.indexOf(invertedx);
-        // pro = d.values[mousedate].value;
-        // ladate = d.values[mousedate].date;
 
         d3.select(this)
         .classed("hover", true)
@@ -314,13 +270,7 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
 					.classed("hover", false)
 					.attr("stroke-width", "0px"), tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "hidden");
 			})
-	  //   .on('mouseout', function(d){      
-	  //     	d3.select(this).style('fill',d3.rgb(colorInit));
-	  //     	d3.select("#major").text("-");
-		// 	tooltip.transition()
-	  //              .duration(500)
-	  //              .style("opacity", 0);
-		// })
+
 	//construction de l'axe y
 	svg.append("g")
             .attr("class", "axis axis--y")
@@ -349,6 +299,6 @@ var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, ref
          mousex = mousex[0] + 5;
          vertical.style("left", mousex + "px")});
 
-  </script>
+  </script> -->
 </body>
 </html>

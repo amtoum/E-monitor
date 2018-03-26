@@ -306,7 +306,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
      * @param integer $idFormation
      * @return void
      */
-    public function getEmotions($dateDebut=false, $dateFin=false,$idFormation=0)
+    public function getEmotions($dateDebut=false, $dateFin=false,$formations='')
     {
         $query = $this->select()
                     ->from(array("f"=>"flux_rapport"), 
@@ -326,6 +326,18 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     ->where("TIME(f.maj) BETWEEN '09:00:00' AND '19:00:00'")
                     ->group(array("code","date"))
                     ->order(array("code","date"));
+        if ($dateDebut !=false && $dateFin != false){
+            $query->where("f.maj >= ?",$dateDebut)
+            ->where("f.maj <= ?",$dateFin);
+        }
+        if ($formations != ''){
+            $subquery = $this->select()
+                        ->from(array("r"=>"flux_rapport"), array("src_id"))
+                        ->where("r.pre_id in (?)",$formations)
+                        ->where("r.src_obj = 'etudiant'");
+            // $query->where("f.dst_id IN (SELECT src_id from flux_rapport where pre_id in (?)",$formations);
+            $query->where("f.dst_id IN ($subquery)");
+        }
         $result = $this->fetchAll($query);//->toArray();
         if ($result->count()>0)
             return $result->toArray();
