@@ -306,7 +306,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
      * @param integer $idFormation
      * @return void
      */
-    public function getEmotions($dateDebut=false, $dateFin=false,$formations='')
+    public function getEmotions($dateDebut=false, $dateFin=false,$formations='',$emos='')
     {
         $query = $this->select()
                     ->from(array("f"=>"flux_rapport"), 
@@ -337,6 +337,9 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                         ->where("r.src_obj = 'etudiant'");
             // $query->where("f.dst_id IN (SELECT src_id from flux_rapport where pre_id in (?)",$formations);
             $query->where("f.dst_id IN ($subquery)");
+        }
+        if ($emos != ''){
+            $query->where("f.src_id IN (?)",$emos);
         }
         $result = $this->fetchAll($query);//->toArray();
         if ($result->count()>0)

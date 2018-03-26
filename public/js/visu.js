@@ -6,7 +6,8 @@ function getData() {
     var dateDebut = $('input[type=dateDebut]').w2field().get(); 
     var dateFin = $('input[type=dateFin]').w2field().get();
     var formationSel =w2ui['gridFormations'].getSelection();
-    var dt = {"dateDebut": dateDebut, "dateFin":dateFin, "formationSel":formationSel};
+    var emos = w2ui['gridEmos'].getSelection();
+    var dt = {"dateDebut": dateDebut, "dateFin":dateFin, "formationSel":formationSel, "emos":emos};
     $.ajax({
         url: "getdatastream",
         data: dt,
@@ -58,6 +59,8 @@ $(function () {
                         '</div>'+
                         '<br><br>'+
                         '<div id="gridFormations" style="width: 100%; height: 350px;"></div>'+
+                        '<br><br>'+
+                        '<div id="gridEmos" style="width: 100%; height: 350px;"></div>'+
                         '<div class="w2ui-buttons">'+
                             '<button class="w2ui-btn" name="valider" onclick="getData()">Valider</button>'+
                         '</div>'+
@@ -82,7 +85,7 @@ $(function () {
     
     w2ui['layout'].content('main', w2ui['layout2']);
 
-    var grid ={
+    var gridFormations ={
         name: 'gridFormations',
         show: { selectColumn: true },
         multiSelect: true,
@@ -93,8 +96,21 @@ $(function () {
 	    ],
 	    records : formations
     };
+
+    var gridEmos ={
+        name: 'gridEmos',
+        show: { selectColumn: true },
+        multiSelect: true,
+        recid: 'recid',
+        
+	    columns: [
+	    	{ field: 'code', caption: 'Emotions', size: '100%'}
+	    ],
+	    records : emos
+    };
     
-    $('#gridFormations').w2grid(grid);
+    $('#gridFormations').w2grid(gridFormations);
+    $('#gridEmos').w2grid(gridEmos);
     
 });
 

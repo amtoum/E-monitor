@@ -87,6 +87,9 @@ class VisualisationController extends Zend_Controller_Action
             $arrayFormation = $this->s->dbE->getFormationsAnnee($this->getNait($now));
             $this->view->formations = json_encode($arrayFormation, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+            $arrayEmos = $this->s->dbT->getAllTags();
+            $this->view->emos = json_encode($arrayEmos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
             $arr = $this->formatEmotions($arrayRes);
             
             $this->view->resultJSON = json_encode($arr["arrayRes"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -143,7 +146,8 @@ class VisualisationController extends Zend_Controller_Action
         $dateFin = $this->_getParam('dateFin');
         // $formations = implode(",",$this->_getParam('formationSel'));
         $formations = $this->_getParam('formationSel');
-        $arrayRes = $this->s->dbR->getEmotions($dateDebut,$dateFin,$formations);
+        $emos = $this->_getParam('emos');
+        $arrayRes = $this->s->dbR->getEmotions($dateDebut,$dateFin,$formations,$emos);
 
         $arr = $this->formatEmotions($arrayRes);
         

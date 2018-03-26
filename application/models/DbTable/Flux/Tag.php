@@ -229,6 +229,29 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         }
 
         return $this->fetchAll($query)->toArray();
+	}
+	
+	/***
+     * Récupère toutes les entrées flux_tag avec certains critères
+     * de tri, intervalles
+     * et ajoute un recid pour w2grid
+     */
+    public function getAllTags($order=null, $limit=0, $from=0)
+    {
+        $query = $this->select()
+        ->from( array("flux_tag" => "flux_tag"), array("recid" =>"tag_id", "code"));
+                    
+        if($order != null)
+        {
+            $query->order($order);
+        }
+
+        if($limit != 0)
+        {
+            $query->limit($limit, $from);
+        }
+
+        return $this->fetchAll($query)->toArray();
     }
 
     /***
