@@ -27,9 +27,9 @@ function getData() {
             // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
             console.log(result);
             w2ui['layout2'].content('main',"<div id='titresViz'>"+
-                        "<p align='center' id='major'>-</p>"+
+                        "<p  id='major'></p>"+
                         "</div>"+
-                        "<p align='center' id='viz'>-</p>"+
+                        "<p  id='viz'></p>"+
                         "<div class='chart'>"+
                                     "</div>");
             if(JSON.parse(result["dateJSON"]).length > 1){
@@ -73,9 +73,9 @@ $(function () {
         panels: [
             { type: 'main', size: 80, resizable: true, style: pstyle, 
             content: "<div id='titresViz'>"+
-            "<p align='center' id='major'>-</p>"+
+            "<p  id='major'></p>"+
             "</div>"+
-            "<p align='center' id='viz'>-</p>"+
+            "<p  id='viz'></p>"+
             "<div class='chart'>"+
                         "</div>" },
                         { type: 'bottom', size: 200, resizable: true, style: pstyle, 
@@ -121,7 +121,7 @@ $(function () {
 
 
 setTimeout(function(){
-    console.log("formations : "+formations);
+    // console.log("formations : "+formations);
     $('input[type=dateDebut]').w2field('date',  { format: 'yyyy-mm-dd', end: $('input[type=dateFin]') });
     $('input[type=dateFin]').w2field('date',  { format: 'yyyy-mm-dd', start: $('input[type=dateDebut]') });
     // layout2 = w2ui['layout2'].get('main');
@@ -142,8 +142,22 @@ setTimeout(function(){
     
 }, 300);
 
+// function to ensure the tip doesn't hang off the side
+function tipX(x){
+    // var winWidth = $(window).width();
+    var winWidth = document.getElementById('titresViz').clientHeight;
+    var tipWidth = $('.tip').width();
+    if (breakpoint == 'xs'){
+      x > winWidth - tipWidth - 20 ? y = x-tipWidth : y = x;
+    } else {
+      x > winWidth - tipWidth - 30 ? y = x-45-tipWidth : y = x+10;
+    }
+    return y;
+  }
+
 function drawStream(keys,data,update){
-    colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#DD1BC6", "#8AD724"];
+    // colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#DD1BC6", "#8AD724"];
+    colorrange =['#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
     strokecolor = colorrange[0];
     // data : { resultJSON: resutJSON ; emotionsJSON: emotionsJSON };
     
@@ -156,40 +170,6 @@ function drawStream(keys,data,update){
         d.value = +d.value;
         d.date = parse(d.date);
     });
-    
-    // refTotal['total']=0;
-    // data.forEach(function(dt){
-    //     //transforme le temps en date
-    //     var dRef = dt.date;		  
-    //     var k = dt.key+'-'+dRef;		  
-    //     refData[k] = dt;
-    //     //cumul les clefs
-    //     if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
-    //     //cumul les dates
-    //     if(!refTotal[dt.temps]){			  
-    //         refTotal[dt.temps]=Math.trunc(dt.value);
-    //     }else{
-    //         refTotal[dt.temps] += Math.trunc(dt.value);
-	// 	  }
-	// 	  refTotal['total'] += Math.trunc(dt.value);
-		  
-	// 	  //cumul les tags
-	// 	  if(!refTag[dt.key]){			  
-    //           refTag[dt.key]={"type":dt.type,"desc":dt.desc,"value":Math.trunc(dt.value)};
-	// 	  }else{
-    //           refTag[dt.key].value += Math.trunc(dt.value);
-	// 	  }
-		  
-    //     });
-    //     //création des couleurs et du tableau de la légende	  
-    //     var sc = d3.scaleLinear().range([0, 1]).domain([0, refKey.length+1]);
-    //     refKey.forEach(function(r,i){
-    //         nbTotal += refTag[r].value;
-    //         var numColor = sc(i);	  
-    //         refTag[r].color=d3.color(numColor);
-    //         legData.colors.push(refTag[r].color);		  
-    //         legData.labels.push(refTag[r].type);		  
-    //     });
         
     var nested_data = d3.nest ()
     .key(function(d) {return d.date;})
@@ -215,7 +195,7 @@ function drawStream(keys,data,update){
 
     var series = stack(data);
     // var divTitreHeight = document.getElementById('titresViz').clientHeight;	
-    var divTitreHeight = document.getElementById('titresViz').clientHeight;	
+    // var divTitreHeight = document.getElementById('titresViz').clientHeight;	
     var margin = {top: 20, right: 30, bottom: 30, left: 30};
     // var width = window.innerWidth - margin.left - margin.right;
     // var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
@@ -248,22 +228,22 @@ function drawStream(keys,data,update){
             return yTest; 
         })
         .y0(function(d) { 
-            var xTest = y(d[0]);
+            var xTest = y(d[0])-.2;
             return xTest; 
             })
-            .y1(function(d) { 
-                var xTest = y(d[1]);
-                return xTest; 
-            })
-            .curve(d3.curveBasis);
+        .y1(function(d) { 
+            var xTest = y(d[1])+.2;
+            return xTest; 
+        })
+        .curve(d3.curveBasis);
                 
                 
     
     if (update){
         w2ui['layout2'].content('main',"<div id='titresViz'>"+
-        "<p align='center' id='major'>-</p>"+
+        "<p  id='major'></p>"+
         "</div>"+
-        "<p align='center' id='viz'>-</p>"+
+        "<p  id='viz'></p>"+
         "<div class='chart'>"+
                     "</div>");
 
@@ -281,14 +261,34 @@ function drawStream(keys,data,update){
     }
     // else {
 
-        var tooltip = d3.select("body")
+
+        $('#viz').prepend('<div class="legend"><div class="title">Emotions :</div></div>');
+        $('.legend').hide();
+        var legend = []
+        series.forEach(function(d,i){
+        var obj = {};
+        obj.key = d.key;
+        obj.color = colorrange[i];
+        legend.push(obj);
+        });
+
+        // others
+        // if (series.length>7){legend.push({key: "Other",color: "#b3b3b3"});}
+
+        legend.forEach(function(d,i){
+        $('.legend').append('<div class="item"><div class="swatch" style="background: '+d.color+'"></div>'+d.key+'</div>');
+        });
+
+        $('.legend').fadeIn();
+
+        var tooltip = d3.select("#viz")
         .append("div")
-        .attr("class", "remove")
+        .attr("class", "tooltip")
         .style("position", "absolute")
         .style("z-index", "20")
         .style("visibility", "hidden")
-        .style("top", "30px")
-        .style("left", "55px");
+        .style("top", "30px");
+        // .style("left", tipX(mousex)+"px");
         
         var svg = d3.select("#viz").append("svg")
         .attr("id", "svgGlobal")
@@ -328,7 +328,8 @@ function drawStream(keys,data,update){
             .classed("hover", true)
             .attr("stroke", strokecolor)
             .attr("stroke-width", "0.5px"), 
-            tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "visible");
+            tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "visible")
+            .style("left", tipX(mousex)+"px");
             
         })
         .on("mouseout", function(d, i) {
