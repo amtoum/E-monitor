@@ -1,4 +1,5 @@
 var layout2 = '';
+var colorInit = "";
 
 function getData() {
     console.log("getData");
@@ -78,7 +79,7 @@ $(function () {
             "<p  id='viz'></p>"+
             "<div class='chart'>"+
                         "</div>" },
-                        { type: 'bottom', size: 200, resizable: true, style: pstyle, 
+                        { type: 'bottom', size: 250, resizable: true, style: pstyle, 
                 content: 'la liste des étudiants se foutera ici' }
             ]
     });
@@ -114,6 +115,7 @@ $(function () {
 
     $('#gridFormations').w2grid().selectAll();
     $('#gridEmos').w2grid().selectAll();
+
     
 });
 
@@ -132,26 +134,28 @@ setTimeout(function(){
     // console.log(w2ui['layout2'].get('main').width);
     
     // var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
-
     
     
+    
+    $('.loader').fadeOut();
     var keys = emotionsJSON;
     var data = resultJSON;
     drawStream(keys, data,false);
     
-    
-}, 300);
+}, 3000);
+
+
 
 // function to ensure the tip doesn't hang off the side
 function tipX(x){
     // var winWidth = $(window).width();
-    var winWidth = document.getElementById('titresViz').clientHeight;
+    var winWidth = parseInt(document.getElementById('layout_layout2_panel_main').style.width,10) -20;//document.getElementById('titresViz').clientHeight;
     var tipWidth = $('.tip').width();
-    if (breakpoint == 'xs'){
-      x > winWidth - tipWidth - 20 ? y = x-tipWidth : y = x;
-    } else {
+    // if (breakpoint == 'xs'){
+    //   x > winWidth - tipWidth - 20 ? y = x-tipWidth : y = x;
+    // } else {
       x > winWidth - tipWidth - 30 ? y = x-45-tipWidth : y = x+10;
-    }
+    // }
     return y;
   }
 
@@ -200,7 +204,7 @@ function drawStream(keys,data,update){
     // var width = window.innerWidth - margin.left - margin.right;
     // var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
 
-    var height = parseInt(document.getElementById('layout_layout2_panel_main').style.height,10) -20;
+    var height = parseInt(document.getElementById('layout_layout2_panel_main').style.height,10) -40;
     var width = parseInt(document.getElementById('layout_layout2_panel_main').style.width,10) -20;
 
     var extData = d3.extent(data, function(d){ 
@@ -208,11 +212,13 @@ function drawStream(keys,data,update){
     });
     var x = d3.scaleTime()
     .domain([extData[0],extData[1]])
-    .range([margin.top, height-margin.bottom]);	
+    // .range([margin.top+100, height-margin.bottom+100]);	
+    .range([100,width-100]);	
 
     var y = d3.scaleLinear()
     .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
-    .range([width/2, margin.left+margin.right]);
+    // .range([width/4, margin.left+margin.right-100]);
+    .range([height-20,0]);	
 
     var z = d3.scaleOrdinal()
     .range(colorrange);
@@ -281,13 +287,16 @@ function drawStream(keys,data,update){
 
         $('.legend').fadeIn();
 
+        var chartTop = $('#viz').offset().top;
+
         var tooltip = d3.select("#viz")
         .append("div")
         .attr("class", "tooltip")
         .style("position", "absolute")
         .style("z-index", "20")
         .style("visibility", "hidden")
-        .style("top", "30px");
+        .style("top", chartTop/2+"px");
+        // .style("top", "30px");
         // .style("left", tipX(mousex)+"px");
         
         var svg = d3.select("#viz").append("svg")
@@ -295,20 +304,33 @@ function drawStream(keys,data,update){
         .attr("width", width)
         .attr("height", height);
         
-        svg.selectAll("path")
+        svg.selectAll(".layer")
         .data(series)
         .enter().append("path")
+        .attr("class",'layer')
         .attr("d", area)
-        .style("fill", function(d, i) { return z(i); })
-        .on('mouseover', function(d){
-            colorInit = d3.select(this).style("fill");      
-            d3.select(this).style('fill',d3.rgb(colorInit).brighter());
+        .style("fill", function(d, i) { return z(i); });
+
+        svg.selectAll(".layer")
+        .attr("opacity", 1)
+        .on('mouseover', function(d,i){
+            
+            // colorInit = d3.select(this).style("fill");      
+            // d3.select(this).style('fill',d3.rgb(colorInit).brighter());
+            
             // d3.select("#major").text(refTag[d.key].type);
-            tooltip.transition()
-            .duration(700)
-            .style("opacity", 1);
+            // tooltip.transition()
+            // .duration(700)
+            // .style("opacity", 1);
+            svg.selectAll(".layer").transition()
+            .duration(250)
+            .attr("opacity", function(d, j) {
+                return j != i ? 0.6 : 1;
+            })
         })
         .on("mousemove", function(d, i) {
+            // colorInit = d3.select(this).style("fill");    
+            // d3.select(this).style('fill',d3.rgb(colorInit).brighter());
             mousex = d3.mouse(this);
             mousex = mousex[0];
             var invertedx = x.invert(mousex);
@@ -322,18 +344,18 @@ function drawStream(keys,data,update){
             var foundDateIndex = dateFns.closestIndexTo(dateToCompare,datearray);
             
             pro = d[foundDateIndex].data[d.key];
-            ladate = d[foundDateIndex].data.utc;
+            ladate = dateFns.format(d[foundDateIndex].data.utc,'YYYY-MM-DD HH:mm');
             
             d3.select(this)
             .classed("hover", true)
             .attr("stroke", strokecolor)
             .attr("stroke-width", "0.5px"), 
-            tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "visible")
+            tooltip.html( "<p>Intensté :" + d.key + "<br>Valeur :" + pro +"<br>Date :"+ladate+ "</p>" ).style("visibility", "visible")
             .style("left", tipX(mousex)+"px");
             
         })
         .on("mouseout", function(d, i) {
-            d3.select(this).style('fill',d3.rgb(colorInit));
+            // d3.select(this).style('fill',d3.rgb(colorInit));
             svg.selectAll(".layer")
             .transition()
             .duration(250)
@@ -346,30 +368,30 @@ function drawStream(keys,data,update){
         //construction de l'axe y
         svg.append("g")
         .attr("class", "axis axis--y")
-        .attr("transform", "translate(" + 0 + "," + 600 + ")")
+        .attr("transform", "translate(" + 0 + "," + (height-20) + ")")
         .call(yAxis);  
         
-        var vertical = d3.select("#viz")
-        .append("div")
-        .attr("class", "remove")
-        .style("position", "absolute")
-        .style("z-index", "19")
-        .style("width", "1px")
-        .style("height", height)
-        .style("top", "10px")
-        .style("bottom", "30px")
-        .style("left", "0px")
-        .style("background", "#fff");
+        // var vertical = d3.select("#viz")
+        // .append("div")
+        // .attr("class", "remove")
+        // .style("position", "absolute")
+        // .style("z-index", "19")
+        // .style("width", "1px")
+        // .style("height", height)
+        // .style("top", "10px")
+        // .style("bottom", "30px")
+        // .style("left", "0px")
+        // .style("background", "#fff");
         
-        d3.select("#viz")
-        .on("mousemove", function(){  
-            mousex = d3.mouse(this);
-            mousex = mousex[0] + 5;
-            vertical.style("left", mousex + "px" )})
-            .on("mouseover", function(){  
-                mousex = d3.mouse(this);
-                mousex = mousex[0] + 5;
-                vertical.style("left", mousex + "px")});
+        // d3.select("#viz")
+        // .on("mousemove", function(){  
+        //     mousex = d3.mouse(this);
+        //     mousex = mousex[0] + 5;
+        //     vertical.style("left", mousex + "px" )})
+        //     .on("mouseover", function(){  
+        //         mousex = d3.mouse(this);
+        //         mousex = mousex[0] + 5;
+        //         vertical.style("left", mousex + "px")});
     // }
         
 }
