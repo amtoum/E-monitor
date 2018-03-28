@@ -39,8 +39,8 @@ function getData() {
             else {//pas assez d'émotions pour tracer le streamgraph
                 w2ui['layout2'].content('main',"La sélection ne retourne pas assez d'émotions pour tracer le graphe.")
             }
-    }
-});
+        }
+    });
 }
 
 $(function () {
@@ -363,6 +363,75 @@ function drawStream(keys,data,update){
             d3.select(this)
             .classed("hover", false)
             .attr("stroke-width", "0px"), tooltip.html( "<p>" + d.key + "<br>" + pro +"<br>"+ladate+ "</p>" ).style("visibility", "hidden");
+        })
+        .on("click", function(d,i){
+            mousex = d3.mouse(this);
+            mousex = mousex[0];
+            var invertedx = x.invert(mousex);
+            var dateToCompare = new Date(invertedx);
+            invertedx = invertedx.getMonth() + invertedx.getDate()+ invertedx.getHours() + invertedx.getMinutes();
+            for (var k = 0; k < d.length; k++) {
+                datearray[k] = d[k].data.utc;
+            }
+            var foundDate = dateFns.closestTo(dateToCompare,datearray);
+            
+            var foundDateIndex = dateFns.closestIndexTo(dateToCompare,datearray);
+            
+            
+            ladate = dateFns.format(d[foundDateIndex].data.utc,'YYYY-MM-DD HH:mm');
+
+            w2ui['layout2'].content('bottom', '<div id="gridEtudiants" style="width: 100%; height: 350px;"></div>');
+
+            var dt = {"date": ladate, "emotion":d.key};
+            $.ajax({
+                url: "getemotiondate",
+                data: dt,
+                type: 'post',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                        w2alert("Erreur : "+e+"\n dt :"+dt);
+                    }
+                },            	
+                success: function(result) {
+                    // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+                    // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
+                    console.log(result);
+                    // w2ui['layout2'].content('main',"<div id='titresViz'>"+
+                    //             "<p  id='major'></p>"+
+                    //             "</div>"+
+                    //             "<p  id='viz'></p>"+
+                    //             "<div class='chart'>"+
+                    //                         "</div>");
+                    // if(JSON.parse(result["dateJSON"]).length > 1){
+                    //     drawStream(JSON.parse(result["emotionsJSON"]), JSON.parse(result["resultJSON"]),true);
+                    // }
+                    // else {//pas assez d'émotions pour tracer le streamgraph
+                    //     w2ui['layout2'].content('main',"La sélection ne retourne pas assez d'émotions pour tracer le graphe.")
+                    // }
+                    if (w2ui['gridEtudiants']){
+                        w2ui['gridEtudiants'].destroy();
+                        } 
+                    var gridEtudiants ={
+                        name: 'gridEtudiants',
+                        recid: 'recid',
+                        
+                        columns: [
+                            { field: 'idEtu', caption: 'Id Etudiant', size: '100%'},
+                            { field: 'emotion', caption: 'Emotion', size: '100%'},
+                            { field: 'valeur', caption: 'Valeur', size: '100%'},
+                            { field: 'date', caption: 'Date', size: '100%'}
+                        ],
+                        records : JSON.parse(result["rs"])
+                    };
+                    $('#gridEtudiants').w2grid(gridEtudiants);
+                }
+            });
+
         })
         
         //construction de l'axe y

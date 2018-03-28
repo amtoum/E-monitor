@@ -347,6 +347,41 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
         else 
             return 0;
     }
+
+    /*
+        SELECT r.rapport_id,t.code,r.src_id, r.dst_id,r.maj,r.niveau
+        FROM `flux_rapport` r
+        INNER JOIN flux_tag t on tag_id = src_id
+        WHERE (DATE(maj) = "2018-03-11" and TIME(maj) between "13:00:00" and "19:00:00")
+        and src_obj ="tag" and dst_obj = "uti" and pre_obj = "doc" and t.code= emotion*/
+    /**
+     * recupère les émotions pour une date donnée
+     *
+     * @param string $date (YYYY-MM-DD)
+     * @param string $heureDebut hh:mm:ss
+     * @param string $heureFin
+     * @param string $emo
+     * @return array
+     */
+    public function getEmotionsByDate($date,$heureDebut,$heureFin,$emo){
+        $query = $this->select()
+        ->from(array("f"=>"flux_rapport"), array("recid"=>"f.rapport_id","emotion"=>"t.code","idEtu"=>"f.dst_id","date"=>"f.maj","valeur"=>"f.niveau"))
+        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        ->joinInner(array('t' => 'flux_tag'),
+            't.tag_id = f.src_id',array())
+        ->where("DATE(f.maj) = ?",$date)
+        ->where("TIME(f.maj) >= ?",$heureDebut)
+        ->where("TIME(f.maj) <= ?",$heureFin)
+        ->where("src_obj= 'tag'")
+        ->where("dst_obj= 'uti'")
+        ->where("pre_obj= 'doc'")
+        ->where("t.code = ?",$emo);
+        $result = $this->fetchAll($query);//->toArray();
+        if ($result->count()>0)
+            return $result->toArray();
+        else 
+            return 0;
+    }
     
  
 }

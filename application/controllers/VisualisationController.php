@@ -160,6 +160,45 @@ class VisualisationController extends Zend_Controller_Action
 
     }
 
+
+    public function getemotiondateAction(){
+        $this->initInstance();
+
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+
+        $date = new DateTime($this->_getParam('date'));
+        $emotion = $this->_getParam('emotion');
+
+        //récupérer date de début et de fin de la demie journée pour une date donnée
+
+        //récupérer temps de saisie autorisés
+        $tempsSaisie = $this->s->dbA->findByCode("tempsSaisie");
+        $tempsSaisie = explode(";",$tempsSaisie[0]["desc"]);
+        $debutDemiJ;
+        $finDemiJ;
+        // check si dans les temps de saisie autorisés
+        foreach($tempsSaisie as $partieTempsSaisie){
+            $limite = explode(",",$partieTempsSaisie);
+            // $date1 = DateTime::createFromFormat('H:i', strftime("%H:%M"));
+            $date1 = DateTime::createFromFormat('H:i',$date->format("H:i"));
+            $date2 = DateTime::createFromFormat('H:i', $limite[0]);
+            $date3 = DateTime::createFromFormat('H:i', $limite[1]);
+            if ($date1 >= $date2 && $date1 <= $date3){
+                $debutDemiJ = $date2;
+                $finDemiJ = $date3;
+            }
+        }
+
+        $result = $this->s->dbR->getEmotionsByDate($date->format("Y-m-d"),$debutDemiJ->format("H:i"),$finDemiJ->format("H:i"),$emotion);
+        $this->view->rs = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+
     /**
      * renvoie la date de naissance (généralement pour une formation )
      *
