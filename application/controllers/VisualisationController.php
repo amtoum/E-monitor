@@ -68,20 +68,31 @@ class VisualisationController extends Zend_Controller_Action
      * @return void
      */
     public function visualisationAction(){
+        
+        
         //si date début et date fin sont spécifiées (saisies dans la vue)
         if ($this->_getParam('dateDebut')&& $this->_getParam('dateFin')){
             $this->getdatastreamAction();
         }
         else {
             $this->initInstance();
-    
+            
             $this->s = new Flux_Site($this->idBase);
             $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
             $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
             $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
-            $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+            $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
             $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
-    
+            
+            if ($_SESSION["user"]){
+                $utiId = $this->s->dbU->existe(array('login'=>$_SESSION["user"]));
+                // $formation = $this->s->dbE->getFormationById($utiId);
+                // $this->view->formation = $this->_getParam('formation', $formation );
+                $infoExi = $this->s->dbE->findByUtiID($utiId);
+                $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
+                $this->view->user =  $this->_getParam('user', $nomPrenom );
+            }
+
             $arrayRes = $this->s->dbR->getEmotions();
             $now = new DateTime('now');
             $arrayFormation = $this->s->dbE->getFormationsAnnee($this->getNait($now));
@@ -106,8 +117,7 @@ class VisualisationController extends Zend_Controller_Action
         $role = $_SESSION["role"];
         $user = $_SESSION["user"];
 		// if ($role == "admin" && $session) {						
-        if ((strpos($role,"enseignant") >=0 || strpos($role,"admin") >=0) && $session) {						
-            //TODO: modifier la ligne au dessus après création espace enseignant
+        if ((strpos($role,"enseignant") !== false || strpos($role,"admin") !== false) && $session) {						
             // if ($session) {						
 			// l'identité existe ; on la récupère
 		    $this->view->identite = $_SESSION["user"];
@@ -160,7 +170,12 @@ class VisualisationController extends Zend_Controller_Action
 
     }
 
-
+    /**
+     * récupère les infos sur une date et une émotion donnée et les renvoie à la vue
+     * pour afficher dans le grid
+     *
+     * @return void
+     */
     public function getemotiondateAction(){
         $this->initInstance();
 
@@ -196,6 +211,89 @@ class VisualisationController extends Zend_Controller_Action
 
         $result = $this->s->dbR->getEmotionsByDate($date->format("Y-m-d"),$debutDemiJ->format("H:i"),$finDemiJ->format("H:i"),$emotion);
         $this->view->rs = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * renvoi des infos avec les étudiants pour une date et une émotion donnée
+     * et le renvoi vers la vue pour un affichage dans la grid
+     *
+     * @return void
+     */
+    public function identifieretudiantsAction(){
+        $this->initInstance();
+
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+        $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
+
+        $date = new DateTime($this->_getParam('date'));
+        $emotion = $this->_getParam('emotion');
+
+        //récupérer date de début et de fin de la demie journée pour une date donnée
+
+        //récupérer temps de saisie autorisés
+        $tempsSaisie = $this->s->dbA->findByCode("tempsSaisie");
+        $tempsSaisie = explode(";",$tempsSaisie[0]["desc"]);
+        $debutDemiJ;
+        $finDemiJ;
+        // check si dans les temps de saisie autorisés
+        foreach($tempsSaisie as $partieTempsSaisie){
+            $limite = explode(",",$partieTempsSaisie);
+            // $date1 = DateTime::createFromFormat('H:i', strftime("%H:%M"));
+            $date1 = DateTime::createFromFormat('H:i',$date->format("H:i"));
+            $date2 = DateTime::createFromFormat('H:i', $limite[0]);
+            $date3 = DateTime::createFromFormat('H:i', $limite[1]);
+            if ($date1 >= $date2 && $date1 <= $date3){
+                $debutDemiJ = $date2;
+                $finDemiJ = $date3;
+            }
+        }
+
+        $result = $this->s->dbR->getEmotionsByDate($date->format("Y-m-d"),$debutDemiJ->format("H:i"),$finDemiJ->format("H:i"),$emotion);
+
+        $role = $_SESSION["role"];
+        $user = $_SESSION["user"];
+
+        //get id enseignant
+        $utiId = $this->s->dbU->existe(array('login'=>$_SESSION["user"]));
+        //get formations de l'enseignant pour la date donnée
+        $nait = $this->getNait($date);
+        $formations = $this->s->dbE->getFormationsProfById($utiId,$nait);
+
+        //parcourir result et voir pour chacun des rapports si la formation de l'idEtu est dans
+        //les formations de l'enseignant 
+        foreach ($result as $key=>$entree){
+            $found = false;
+            $formEtu = $this->s->dbE->getIdFormationById($entree["idEtu"],$nait);
+            if (strpos($role,"admin")!==false){ //l'admin peut lever l'anonymat sur tout
+                $infoExi = $this->s->dbE->findByUtiID($entree["idEtu"]);
+                $result[$key]["nom"] = $infoExi["nom"];
+                $result[$key]["prenom"] =$infoExi["prenom"];
+            }
+            else if (strpos($role,"admin")!==false){
+                foreach ($formations as $key1=>$field){
+                    if ($formEtu == $field['pre_id']){
+                        $found = $key1;
+                    }
+                }
+                if ($found !== false){
+                    $infoExi = $this->s->dbE->findByUtiID($entree["idEtu"]);
+                    $result[$key]["nom"] = $infoExi["nom"];
+                    $result[$key]["prenom"] =$infoExi["prenom"];
+                }
+                else {
+                    $result[$key]["nom"] = '*****';
+                    $result[$key]["prenom"] ='*****';
+                }
+            }
+        }
+
+        $this->view->rs = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);        
+
     }
 
 

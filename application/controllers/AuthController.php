@@ -95,17 +95,17 @@ class AuthController extends Zend_Controller_Action
 				$_SESSION["role"] = $role;
 			}
 			switch (true) {
-				case strpos($role,"etudiant") >= 0 :
+				case strpos($role,"etudiant") !== false :
 					// $this->view->role = "ETUDIANT";
 					$this->redirect('/carte/emotions');
 
 
 
 					break;
-				case strpos($role,"enseignant") >= 0 :
-					// $this->view->role = "ENSEIGNANT";
+				case strpos($role,"enseignant") !== false :
+					$this->redirect('/visualisation/visualisation');
 					break;
-				case strpos($role,"admin") >= 0 :
+				case strpos($role,"admin") !== false :
 					// $this->view->role = "ADMIN";
 					$this->redirect('/admin/importcsv');
 					

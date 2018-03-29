@@ -83,7 +83,7 @@ class CarteController extends Zend_Controller_Action
         // $this->view->titre =  $this->_getParam('titre', "Roue des émotions");
         if ($_SESSION["user"]){
             $utiId = $this->s->dbu->existe(array('login'=>$_SESSION["user"]));
-            $formation = $this->s->dbE->getFormationById($utiId);
+            $formation = $this->s->dbE->getFormationById($utiId,$this->getNait(New DateTime('now')));
             $this->view->formation = $this->_getParam('formation', $formation );
             $infoExi = $this->s->dbE->findByUtiID($utiId);
             $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
@@ -239,7 +239,7 @@ class CarteController extends Zend_Controller_Action
         $session =  session_start();
         // $auth = Zend_Auth::getInstance();
         $role = $_SESSION["role"];
-		if (strpos($role,"etudiant") >=0 && $session) {						
+		if (strpos($role,"etudiant") !== false && $session) {						
 			// l'identité existe ; on la récupère
 		    $this->view->identite = $_SESSION["user"];
 		    // $ssUti = new Zend_Session_Namespace('uti');
@@ -262,7 +262,25 @@ class CarteController extends Zend_Controller_Action
         $this->view->langue = $this->_getParam('langue','fr');
                 
     }
+
     
+    /**
+     * renvoie la date de naissance (généralement pour une formation )
+     *
+     * @param datetime $date
+     * @return datetime
+     */
+    private function getNait($date){
+        $month = intval($date->format('n'),10);
+        if ($month>=1 && $month<9 ){// si le mois est janvier ... aout
+            $dateNait = new DateTime((intval($date->format('Y')-1,10)).'-09-01');
+        } 
+        else{
+            $dateNait = new DateTime($date->format('Y').'-09-01');
+        }
+        return $dateNait->format('Y-m-d');
+    }
+
 }
 
 

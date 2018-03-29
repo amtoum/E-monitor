@@ -74,10 +74,31 @@ p {
 	margin-right: 5px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
+/* Create two unequal columns that floats next to each other */
+.column {
+    float: left;
+    /*padding: 10px;
+    /*height: 300px; /* Should be removed. Only for demonstration */
+}
+
+
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 </style>
 <head>
   <meta charset="utf-8">
-  <title><?php echo $this->titre;?></title>
+  <title>E-monitor - Espace Enseignant</title>
   
   <script src="../js/date_fns.min.js"></script>
   <script src="../js/d3.v4.min.js"></script>
@@ -97,6 +118,7 @@ p {
 			var emotionsJSON = <?php echo $this->emotionsJSON;?>;
 			var formations = <?php echo $this->formations;?>;
 			var emos = <?php echo $this->emos;?>;
+			var user = '<?php echo $this->user;?>';
 			</script>
 	<script src="../js/visu.js"></script>
 	<div class="loader"></div>

@@ -200,8 +200,8 @@ class AdminController extends Zend_Controller_Action {
         $this->s->dbU = new Model_DbTable_Flux_Uti($this->s->db);
         
         $this->idMonade = $this->s->dbM->ajouter(array("titre"=>"E-monitor"),true,false);
-
-        //DONE: utiliser le type pour différencier l'ajout d'étudiants ou d'enseignants 
+        $nait = $this->getNait(new DateTime('now'));
+        
         if($this->_getParam('type'))
             $typeSidebar = $this->_getParam('type');
 
@@ -214,14 +214,14 @@ class AdminController extends Zend_Controller_Action {
                     
                     $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "etudiant"));
                     $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
-                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait )) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
-                    "nait" => "2017-09-01", "niveau" => $idFormationExi)) ;
+                    "nait" => $nait, "niveau" => $idFormationExi)) ;
                     $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
                     "src_id"=>$idEtudiantUti, "src_obj"=>"etudiant",
                         "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
                         "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
-                        "valeur"=>"2017-09-01"));
+                        "valeur"=>$nait));
                         
                         // echo implode(',',$ligne);
                         // echo ("\n".$ligne["nom"]." ".$ligne["prenom"]." ".$ligne["email"]."\n" );
@@ -236,14 +236,14 @@ class AdminController extends Zend_Controller_Action {
                     
                     $idEnseignantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "enseignant"));
                     $idEnseignantExi = $this->s->dbE->ajouter(array("uti_id" => $idEnseignantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
-                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => "2017-09-01" )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait )) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
-                    "nait" => "2017-09-01", "niveau" => $idFormationExi)) ;
+                    "nait" => $nait, "niveau" => $idFormationExi)) ;
                     $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
                     "src_id"=>$idEnseignantExi, "src_obj"=>"enseignant",
                         "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
                         "pre_id"=>$idFormationExi, "pre_obj"=>"formation",
-                        "valeur"=>"2017-09-01"));
+                        "valeur"=>$nait));
                         
                         // echo implode(',',$ligne);
                         // echo ("\n".$ligne["nom"]." ".$ligne["prenom"]." ".$ligne["email"]."\n" );
@@ -280,7 +280,7 @@ class AdminController extends Zend_Controller_Action {
         $role = $_SESSION["role"];
         $user = $_SESSION["user"];
 		// if ($role == "admin" && $session) {						
-        if (strpos($role,"admin") >=0 && $session) {						
+        if (strpos($role,"admin") !== false && $session) {						
             //TODO: modifier la ligne au dessus après création espace enseignant
             // if ($session) {						
 			// l'identité existe ; on la récupère
@@ -313,5 +313,22 @@ class AdminController extends Zend_Controller_Action {
          {
             return $filename;
          }
+    }
+
+    /**
+     * renvoie la date de naissance (généralement pour une formation )
+     *
+     * @param datetime $date
+     * @return datetime
+     */
+    private function getNait($date){
+        $month = intval($date->format('n'),10);
+        if ($month>=1 && $month<9 ){// si le mois est janvier ... aout
+            $dateNait = new DateTime((intval($date->format('Y')-1,10)).'-09-01');
+        } 
+        else{
+            $dateNait = new DateTime($date->format('Y').'-09-01');
+        }
+        return $dateNait->format('Y-m-d');
     }
 }

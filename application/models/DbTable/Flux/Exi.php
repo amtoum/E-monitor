@@ -333,27 +333,81 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     }    
     
     /**
-     * Récupère la formation d'un étudiant
-     *      SELECT nom FROM `flux_exi` INNER JOIN flux_rapport on exi_id = pre_id WHERE `src_id` = 47 AND `src_obj` LIKE 'etudiant'
+     * Récupère l'id de la formation d'un étudiant pour une année donnée
+     *      SELECT exi_id FROM `flux_exi` INNER JOIN flux_rapport on exi_id = pre_id WHERE `src_id` = 47 AND `src_obj` LIKE 'etudiant'
+     *      and r.valeur = "2017-09-01"
      * @param int $utiId
      * 
      * @return string
      */
-    //TODO: récupérer la formation de l'année courante
-    public function getFormationById($utiId){
-        // $subquery = $this->
+    public function getIdFormationById($utiId,$nait){
+        
+        $query = $this->select()
+                    ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+                    ->from( array("e" => "flux_exi"), array('exi_id') )  
+                    ->joinInner(array('r' => 'flux_rapport'),
+                        'e.exi_id = r.pre_id',array())                     
+                    ->where( "r.src_id = ? AND r.src_obj LIKE 'etudiant'", $utiId )
+                    ->where("r.valeur = ?",$nait);
+        $rows = $this->fetchAll($query);        
+        if($rows->count()>0)$result=$rows[0]->exi_id; else $result=false;
+        
+        
+        return $result;
+        
+    }
+    
+    /**
+     * Récupère la formation d'un étudiant pour une année donnée
+     *      SELECT nom FROM `flux_exi` INNER JOIN flux_rapport on exi_id = pre_id WHERE `src_id` = 47 AND `src_obj` LIKE 'etudiant'
+     *      and r.valeur = "2017-09-01"
+     * @param int $utiId
+     * 
+     * @return string
+     */
+    public function getFormationById($utiId,$nait){
+        
         $query = $this->select()
                     ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
                     ->from( array("e" => "flux_exi"), array('nom') )  
                     ->joinInner(array('r' => 'flux_rapport'),
                         'e.exi_id = r.pre_id')                     
-                    ->where( "r.src_id = ? AND r.src_obj LIKE 'etudiant'", $utiId );
+                    ->where( "r.src_id = ? AND r.src_obj LIKE 'etudiant'", $utiId )
+                    ->where("r.valeur = ?",$nait);
         $rows = $this->fetchAll($query);        
         if($rows->count()>0)$result=$rows[0]->nom; else $result=false;
         
         
         return $result;
         
+    }
+
+    /**
+     * récupère les formations d'un prof
+     * 
+     * SELECT pre_id FROM flux_exi e
+     * Inner join `flux_rapport` r on e.exi_id = r.src_id
+     * where src_obj = "enseignant" and dst_obj = "groupe" and pre_obj="formation"  
+     * and src_id=89 and r.valeur = "2017-09-01"
+     *
+     * @param int $utiId
+     * @return array
+     */
+    public function getFormationsProfById($utiId,$nait){
+
+        $query = $this->select()
+                    ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+                    ->from( array("e" => "flux_exi"), array('r.pre_id') )  
+                    ->joinInner(array('r' => 'flux_rapport'),
+                        'e.exi_id = r.src_id',array())                     
+                    ->where( "r.src_id = ? AND r.src_obj = 'etudiant' and r.dst_obj='groupe' and pre_obj='formation'", $utiId )
+                    ->where("r.valeur = ?",$nait);
+        $result = $this->fetchAll($query);        
+        if($result->count()>0)
+            return $result->toArray(); 
+        else 
+            return false;
+
     }
     
     /**

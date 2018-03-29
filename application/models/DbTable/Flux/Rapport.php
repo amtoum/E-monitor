@@ -326,9 +326,11 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
                     ->where("TIME(f.maj) BETWEEN '09:00:00' AND '19:00:00'")
                     ->group(array("code","date"))
                     ->order(array("code","date"));
-        if ($dateDebut !=false && $dateFin != false){
-            $query->where("f.maj >= ?",$dateDebut)
-            ->where("f.maj <= ?",$dateFin);
+        if ($dateDebut !=false){
+            $query->where("f.maj >= ?",$dateDebut);
+        }
+        if ($dateFin != false){
+            $query->where("f.maj <= ?",$dateFin);
         }
         if ($formations != ''){
             $subquery = $this->select()

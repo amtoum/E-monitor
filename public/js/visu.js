@@ -48,6 +48,45 @@ function getData() {
 function identifier(){
     console.log("click sur identifier !!");
     console.log("dtEmo : date="+dtEmo["date"]+" emotion="+dtEmo["emotion"]);
+    $.ajax({
+        url: "identifieretudiants",
+        data: dtEmo,
+        type: 'post',
+        dataType: 'json',
+        error: function(error){
+            try {
+                var js = JSON.parse(error.responseText);
+                w2alert("Erreur : "+error.responseText+"\n error :"+error);
+            } catch (e) {
+                console.log(error.responseText)            		  	
+                w2alert("Erreur : "+e+"\n dt :"+dt);
+            }
+        },            	
+        success: function(result) {
+            // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+            // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
+            console.log(result);
+            if (w2ui['gridEtudiants']){
+                w2ui['gridEtudiants'].destroy();
+                } 
+            var gridEtudiants ={
+                name: 'gridEtudiants',
+                recid: 'recid',
+                
+                columns: [
+                    { field: 'idEtu', caption: 'Id Etudiant', size: '100%'},
+                    { field: 'nom', caption: 'Nom', size: '100%'},
+                    { field: 'prenom', caption: 'Prenom', size: '100%'},
+                    { field: 'emotion', caption: 'Emotion', size: '100%'},
+                    { field: 'valeur', caption: 'Valeur', size: '100%'},
+                    { field: 'date', caption: 'Date', size: '100%'}
+                ],
+                records : JSON.parse(result["rs"])
+            };
+            $('#gridEtudiants').w2grid(gridEtudiants);
+        }
+    });
+
 }
 
 $(function () {
@@ -55,20 +94,32 @@ $(function () {
     $('#layout').w2layout({
         name: 'layout',
         panels: [
-            { type: 'top', size: 50, style: pstyle, content: "Entête du haut avec nom d'utilisateur" },
+            { type: 'top', size: 50, style: 'font-size:16px; border: 1px solid #dfdfdf; padding: 1px;', content: 
+                            '<div class="row">'+
+                            '<div class="column left" style="width:75%;">'+
+                                '<div id="text" style="float: left; font-size:20px;">'+
+                                    'Espace Enseignant - Utilisateur : '+user+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="column right" style="width:25%;" >'+
+                                '<div class="w2ui-buttons" style="float: right;" >'+
+                                '<button class="w2ui-btn w2ui-btn-grey"  name="deconnexion" onclick="disconnect()">Déconnexion</button><br><br>'+
+                            '</div>'+
+                            '</div>' },
             { type: 'main', style: pstyle, content: 'main' },
             { type: 'right', size: 300, style: pstyle, 
             content: '<div class="block">'+
-                        '<b>Date</b>'+
+                        '<b>Filtres</b>'+
+                        '<br><u>Dates</u> :'+
                         '<div>'+
                             '<br><label>Date de Début :</label> <input type="dateDebut">'+
                             '<br><br>'+
                             '<label>Date de Fin :  </label> <input type="dateFin">'+
                         '</div>'+
-                        '<br><br>'+
-                        '<div id="gridFormations" style="width: 100%; height: 350px;"></div>'+
-                        '<br><br>'+
-                        '<div id="gridEmos" style="width: 100%; height: 350px;"></div>'+
+                        '<br><u>Formations</u> :<br>'+
+                        '<div id="gridFormations" style="width: 100%; height: 200px;"></div>'+
+                        '<br><u>Emotions</u> :<br>'+
+                        '<div id="gridEmos" style="width: 100%; height: 200px;"></div>'+
                         '<div class="w2ui-buttons">'+
                             '<button class="w2ui-btn" name="valider" onclick="getData()">Valider</button>'+
                         '</div>'+
@@ -87,7 +138,7 @@ $(function () {
             "<div class='chart'>"+
                         "</div>" },
                         { type: 'bottom', size: 250, resizable: true, style: pstyle, 
-                content: 'la liste des étudiants se foutera ici' }
+                content: "Cliquez sur le graphe pour afficher plus d'informations sur la saisie des étudiants." }
             ]
     });
     
@@ -97,10 +148,11 @@ $(function () {
         name: 'gridFormations',
         show: { selectColumn: true },
         multiSelect: true,
+        fixedBody: true,
         recid: 'recid',
         
 	    columns: [
-	    	{ field: 'nom', caption: 'Formations', size: '100%'}
+	    	{ field: 'nom', caption: '', size: '100%'}
 	    ],
 	    records : formations
     };
@@ -109,10 +161,11 @@ $(function () {
         name: 'gridEmos',
         show: { selectColumn: true },
         multiSelect: true,
+        fixedBody: true,
         recid: 'recid',
         
 	    columns: [
-	    	{ field: 'code', caption: 'Emotions', size: '100%'}
+	    	{ field: 'code', caption: '', size: '100%'}
 	    ],
 	    records : emos
     };
@@ -122,6 +175,8 @@ $(function () {
 
     $('#gridFormations').w2grid().selectAll();
     $('#gridEmos').w2grid().selectAll();
+
+    
 
     
 });
@@ -387,7 +442,7 @@ function drawStream(keys,data,update){
             
             ladate = dateFns.format(d[foundDateIndex].data.utc,'YYYY-MM-DD HH:mm');
 
-            w2ui['layout2'].content('bottom', '<div id="gridEtudiants" style="width: 100%; height: 350px;"></div>'+
+            w2ui['layout2'].content('bottom', '<div id="gridEtudiants" style="width: 100%; height: 180px;"></div>'+
                                 '<br>'+
                                 '<div class="w2ui-buttons" style="float: right;">'+
                                     '<button class="w2ui-btn" name="valider" onclick="identifier()">Identifier</button>'+
@@ -476,4 +531,8 @@ function drawStream(keys,data,update){
         //         vertical.style("left", mousex + "px")});
     // }
         
+}
+
+function disconnect() {
+    window.location.href="../auth/deconnexion";
 }
