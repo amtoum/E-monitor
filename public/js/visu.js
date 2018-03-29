@@ -350,7 +350,7 @@ function drawStream(keys,data,update){
             .classed("hover", true)
             .attr("stroke", strokecolor)
             .attr("stroke-width", "0.5px"), 
-            tooltip.html( "<p>Intensté :" + d.key + "<br>Valeur :" + pro +"<br>Date :"+ladate+ "</p>" ).style("visibility", "visible")
+            tooltip.html( "<p>Emotion :" + d.key + "<br>Valeur :" + pro +"<br>Date :"+ladate+ "</p>" ).style("visibility", "visible")
             .style("left", tipX(mousex)+"px");
             
         })
