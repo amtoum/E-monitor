@@ -280,7 +280,7 @@ class AdminController extends Zend_Controller_Action {
         $role = $_SESSION["role"];
         $user = $_SESSION["user"];
 		// if ($role == "admin" && $session) {						
-        if ($session && ($user=="atoumia" || $user=="louaprem")) {						
+        if (strpos($role,"admin") >=0 && $session) {						
             //TODO: modifier la ligne au dessus après création espace enseignant
             // if ($session) {						
 			// l'identité existe ; on la récupère

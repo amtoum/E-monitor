@@ -239,7 +239,7 @@ class CarteController extends Zend_Controller_Action
         $session =  session_start();
         // $auth = Zend_Auth::getInstance();
         $role = $_SESSION["role"];
-		if ($role == "etudiant" && $session) {						
+		if (strpos($role,"etudiant") >=0 && $session) {						
 			// l'identité existe ; on la récupère
 		    $this->view->identite = $_SESSION["user"];
 		    // $ssUti = new Zend_Session_Namespace('uti');

@@ -1,5 +1,7 @@
 var layout2 = '';
 var colorInit = "";
+var dtEmo = {"date": "", "emotion":""};
+
 
 function getData() {
     console.log("getData");
@@ -41,6 +43,11 @@ function getData() {
             }
         }
     });
+}
+
+function identifier(){
+    console.log("click sur identifier !!");
+    console.log("dtEmo : date="+dtEmo["date"]+" emotion="+dtEmo["emotion"]);
 }
 
 $(function () {
@@ -380,12 +387,16 @@ function drawStream(keys,data,update){
             
             ladate = dateFns.format(d[foundDateIndex].data.utc,'YYYY-MM-DD HH:mm');
 
-            w2ui['layout2'].content('bottom', '<div id="gridEtudiants" style="width: 100%; height: 350px;"></div>');
+            w2ui['layout2'].content('bottom', '<div id="gridEtudiants" style="width: 100%; height: 350px;"></div>'+
+                                '<br>'+
+                                '<div class="w2ui-buttons" style="float: right;">'+
+                                    '<button class="w2ui-btn" name="valider" onclick="identifier()">Identifier</button>'+
+                                '</div>');
 
-            var dt = {"date": ladate, "emotion":d.key};
+            dtEmo = {"date": ladate, "emotion":d.key};
             $.ajax({
                 url: "getemotiondate",
-                data: dt,
+                data: dtEmo,
                 type: 'post',
                 dataType: 'json',
                 error: function(error){
@@ -400,7 +411,9 @@ function drawStream(keys,data,update){
                 success: function(result) {
                     // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
                     // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
-                    console.log(result);
+                    
+                    // console.log(result);
+                    
                     // w2ui['layout2'].content('main',"<div id='titresViz'>"+
                     //             "<p  id='major'></p>"+
                     //             "</div>"+

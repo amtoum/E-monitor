@@ -94,21 +94,19 @@ class AuthController extends Zend_Controller_Action
 				$_SESSION["user"] = phpCAS::getUser();
 				$_SESSION["role"] = $role;
 			}
-			switch ($role) {
-				case "etudiant" :
-					$this->view->role = "ETUDIANT";
-					//TODO: redirect vers version finale de la roue
-					// $this->redirect('/carte/roueemotion');
+			switch (true) {
+				case strpos($role,"etudiant") >= 0 :
+					// $this->view->role = "ETUDIANT";
 					$this->redirect('/carte/emotions');
 
 
 
 					break;
-				case "enseignant" :
-					$this->view->role = "ENSEIGNANT";
+				case strpos($role,"enseignant") >= 0 :
+					// $this->view->role = "ENSEIGNANT";
 					break;
-				case "admin" :
-					$this->view->role = "ADMIN";
+				case strpos($role,"admin") >= 0 :
+					// $this->view->role = "ADMIN";
 					$this->redirect('/admin/importcsv');
 					
 
