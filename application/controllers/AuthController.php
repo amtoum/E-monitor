@@ -96,7 +96,7 @@ class AuthController extends Zend_Controller_Action
 			}
 			switch (true) {
 				case strpos($role,"enseignant") !== false :
-					$this->redirect('/visualisation/visualisation');
+					$this->redirect('/visualisation/');
 					break;
 				case strpos($role,"etudiant") !== false :
 					// $this->view->role = "ETUDIANT";

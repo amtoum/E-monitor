@@ -4,8 +4,8 @@ var dtEmo = {"date": "", "emotion":""};
 
 
 function getData() {
-    console.log("getData");
-    console.log("selection : "+w2ui['gridFormations'].getSelection());
+    // console.log("getData");
+    // console.log("selection : "+w2ui['gridFormations'].getSelection());
     var dateDebut = $('input[type=dateDebut]').w2field().get(); 
     var dateFin = $('input[type=dateFin]').w2field().get();
     var formationSel =w2ui['gridFormations'].getSelection();
@@ -28,7 +28,7 @@ function getData() {
         success: function(result) {
             // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
             // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
-            console.log(result);
+            // console.log(result);
             w2ui['layout2'].content('main',"<div id='titresViz'>"+
                         "<p  id='major'></p>"+
                         "</div>"+
@@ -46,8 +46,8 @@ function getData() {
 }
 
 function identifier(){
-    console.log("click sur identifier !!");
-    console.log("dtEmo : date="+dtEmo["date"]+" emotion="+dtEmo["emotion"]);
+    // console.log("click sur identifier !!");
+    // console.log("dtEmo : date="+dtEmo["date"]+" emotion="+dtEmo["emotion"]);
     $.ajax({
         url: "identifieretudiants",
         data: dtEmo,
@@ -65,7 +65,7 @@ function identifier(){
         success: function(result) {
             // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
             // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
-            console.log(result);
+            // console.log(result);
             if (w2ui['gridEtudiants']){
                 w2ui['gridEtudiants'].destroy();
                 } 
@@ -76,7 +76,7 @@ function identifier(){
                 columns: [
                     { field: 'idEtu', caption: 'Id Etudiant', size: '100%'},
                     { field: 'nom', caption: 'Nom', size: '100%'},
-                    { field: 'prenom', caption: 'Prenom', size: '100%'},
+                    { field: 'prenom', caption: 'Prénom', size: '100%'},
                     { field: 'formation', caption: 'Formation', size: '100%'},
                     { field: 'emotion', caption: 'Emotion', size: '100%'},
                     { field: 'valeur', caption: 'Valeur', size: '100%'},
@@ -120,7 +120,7 @@ $(function () {
                         '<br><u>Formations</u> :<br>'+
                         '<div id="gridFormations" style="width: 100%; height: 200px;"></div>'+
                         '<br><u>Emotions</u> :<br>'+
-                        '<div id="gridEmos" style="width: 100%; height: 200px;"></div>'+
+                        '<div id="gridEmos" style="width: 100%; height: 220px;"></div>'+
                         '<div class="w2ui-buttons">'+
                             '<button class="w2ui-btn" name="valider" onclick="getData()">Valider</button>'+
                         '</div>'+
@@ -186,20 +186,9 @@ $(function () {
 
 
 setTimeout(function(){
-    // console.log("formations : "+formations);
     $('input[type=dateDebut]').w2field('date',  { format: 'yyyy-mm-dd', end: $('input[type=dateFin]') });
     $('input[type=dateFin]').w2field('date',  { format: 'yyyy-mm-dd', start: $('input[type=dateDebut]') });
-    // layout2 = w2ui['layout2'].get('main');
-    // console.log("putain height :"+document.getElementById('layout_layout2_panel_main').height);
-    // console.log(document.getElementsByName('layout2'));
-    // console.log("layout2 :"+layout2);
-    // console.log(w2ui['layout2'].get('main').height);
-    // console.log(w2ui['layout2'].get('main').width);
-    
-    // var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
-    
-    
-    
+
     $('.loader').fadeOut();
     var keys = emotionsJSON;
     var data = resultJSON;
@@ -461,27 +450,11 @@ function drawStream(keys,data,update){
                         w2alert("Erreur : "+error.responseText+"\n error :"+error);
                     } catch (e) {
                         console.log(error.responseText)            		  	
-                        w2alert("Erreur : "+e+"\n dt :"+dt);
+                        w2alert("Erreur : "+e+"\n dt :"+dtEmo);
                     }
                 },            	
                 success: function(result) {
-                    // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
-                    // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
-                    
-                    // console.log(result);
-                    
-                    // w2ui['layout2'].content('main',"<div id='titresViz'>"+
-                    //             "<p  id='major'></p>"+
-                    //             "</div>"+
-                    //             "<p  id='viz'></p>"+
-                    //             "<div class='chart'>"+
-                    //                         "</div>");
-                    // if(JSON.parse(result["dateJSON"]).length > 1){
-                    //     drawStream(JSON.parse(result["emotionsJSON"]), JSON.parse(result["resultJSON"]),true);
-                    // }
-                    // else {//pas assez d'émotions pour tracer le streamgraph
-                    //     w2ui['layout2'].content('main',"La sélection ne retourne pas assez d'émotions pour tracer le graphe.")
-                    // }
+                   
                     if (w2ui['gridEtudiants']){
                         w2ui['gridEtudiants'].destroy();
                         } 
