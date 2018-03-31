@@ -67,7 +67,7 @@ class VisualisationController extends Zend_Controller_Action
      *
      * @return void
      */
-    public function visualisationAction(){
+    public function indexAction(){
         
         
         //si date début et date fin sont spécifiées (saisies dans la vue)
@@ -273,6 +273,7 @@ class VisualisationController extends Zend_Controller_Action
                 $infoExi = $this->s->dbE->findByUtiID($entree["idEtu"]);
                 $result[$key]["nom"] = $infoExi["nom"];
                 $result[$key]["prenom"] =$infoExi["prenom"];
+                $result[$key]["formation"] = $this->s->dbE->getFormationById($entree["idEtu"],$nait);
             }
             else if (strpos($role,"admin")!==false){
                 foreach ($formations as $key1=>$field){
@@ -284,10 +285,12 @@ class VisualisationController extends Zend_Controller_Action
                     $infoExi = $this->s->dbE->findByUtiID($entree["idEtu"]);
                     $result[$key]["nom"] = $infoExi["nom"];
                     $result[$key]["prenom"] =$infoExi["prenom"];
+                    $result[$key]["formation"] = $this->s->dbE->getFormationById($entree["idEtu"],$nait);
                 }
                 else {
                     $result[$key]["nom"] = '*****';
                     $result[$key]["prenom"] ='*****';
+                    $result[$key]["formation"] = '*****';
                 }
             }
         }

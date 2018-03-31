@@ -77,6 +77,7 @@ function identifier(){
                     { field: 'idEtu', caption: 'Id Etudiant', size: '100%'},
                     { field: 'nom', caption: 'Nom', size: '100%'},
                     { field: 'prenom', caption: 'Prenom', size: '100%'},
+                    { field: 'formation', caption: 'Formation', size: '100%'},
                     { field: 'emotion', caption: 'Emotion', size: '100%'},
                     { field: 'valeur', caption: 'Valeur', size: '100%'},
                     { field: 'date', caption: 'Date', size: '100%'}
