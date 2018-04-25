@@ -21,26 +21,47 @@ class AdminController extends Zend_Controller_Action {
     
     public function indexAction()
     {
-        $this->initInstance();
+
+        $this->redirect('/admin/importcsv');
+
+//         $this->initInstance();
         
+//         $this->s = new Flux_Site($this->idBase);
+//         $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+//         $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+//         $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+//         $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+//         $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+//         $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+//         $this->s->dbu = new Model_DbTable_Flux_Uti($this->s->db);
+        
+//         $arrayRes = $this->s->dbT->getRecidAll();
+        
+// //         $arrayRes = $this->s->dbT->fetchAll($query)->toArray();
+//         $resJSON = json_encode($arrayRes, JSON_PRETTY_PRINT);
+        
+//         $this->view->resJSON = $resJSON;
+//         if ($_SESSION["user"]){
+//             $utiId = $this->s->dbu->existe(array('login'=>$_SESSION["user"]));
+//             $infoExi = $this->s->dbE->findByUtiID($utiId);
+//             $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
+//             $this->view->user =  $this->_getParam('user', $nomPrenom );
+//         }
+    }
+    
+    public function importcsvAction()
+    {
+        $this->initInstance();
+
         $this->s = new Flux_Site($this->idBase);
         $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
         $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
         $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
         $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
         $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+        $this->s->dbu = new Model_DbTable_Flux_Uti($this->s->db);
         
-        $arrayRes = $this->s->dbT->getRecidAll();
-        
-//         $arrayRes = $this->s->dbT->fetchAll($query)->toArray();
-        $resJSON = json_encode($arrayRes, JSON_PRETTY_PRINT);
-        
-        $this->view->resJSON = $resJSON;
-    }
-    
-    public function importcsvAction()
-    {
-        $this->initInstance();
         //get du parametre resJSON reçu après upload
         if ($this->_getparam('resJSON',false)){
             $this->view->resJSON = $this->_getparam('resJSON');
@@ -50,9 +71,12 @@ class AdminController extends Zend_Controller_Action {
             $this->view->selection = $this->_getparam('selection');
         }
 
-        if ($_SESSION["user"])
-        $this->view->user =  $this->_getParam('user', $_SESSION["user"] );
-
+        if ($_SESSION["user"]){
+            $utiId = $this->s->dbu->existe(array('login'=>$_SESSION["user"]));
+            $infoExi = $this->s->dbE->findByUtiID($utiId);
+            $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
+            $this->view->user =  $this->_getParam('user', $nomPrenom );
+        }
         // Import csv et echo
         
         // $this->view->titre =  $this->_getParam('titre', "Page Test admin");
@@ -187,8 +211,22 @@ class AdminController extends Zend_Controller_Action {
 
     }
 
+    public function savecontroledataAction(){
+        $this->initInstance();
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+        if($this->_getParam('tempsSaisie')){
+            $id = $this->s->dbA->existe(array("code"=>"tempsSaisie"));
+            $this->s->dbA->edit($id,array("desc"=>$this->_getParam('tempsSaisie')));
+        }
+        if($this->_getParam('joursSaisie')){
+            $id = $this->s->dbA->existe(array("code"=>"joursSaisie"));
+            $this->s->dbA->edit($id,array("desc"=>$this->_getParam('joursSaisie')));
+        }
+    }
+
     public function savejsonintodbAction(){
-        //TODO: changer la date de naissance (nait) pour que ça marche au fil des années
+        
         $this->initInstance();
 
         $this->s = new Flux_Site($this->idBase);
@@ -270,6 +308,19 @@ class AdminController extends Zend_Controller_Action {
 
         $this->view->rs = json_encode($this->s->dbE->getByChamp("data",$typeSidebar));
 
+    }
+
+    public function getcontroledataAction(){
+        $this->initInstance();
+        
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbA = new Model_DbTable_Flux_Acti($this->s->db);
+
+        
+        $joursSaisie = $this->s->dbA->findByCode("joursSaisie");
+        $tempsSaisie = $this->s->dbA->findByCode("tempsSaisie");
+        $this->view->joursSaisie = $joursSaisie[0]["desc"];
+        $this->view->tempsSaisie = $tempsSaisie[0]["desc"];
     }
  
 

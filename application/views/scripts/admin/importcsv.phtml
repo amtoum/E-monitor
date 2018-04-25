@@ -27,7 +27,7 @@
 	</head>
     <body>
 
-    <div id="layoutPrincipal" style="width: 100%; height: 800px;"></div>
+    <div id="layoutPrincipal" style="position: absolute; top: 10px; left: 10px; bottom: 10px; right: 10px;"></div>
 
     <script >
     
@@ -52,8 +52,45 @@
     ]
     });
     
-    function save () { 
-        console.log("***************save************"); 
+    function save() { 
+        // console.log("save "+w2ui['sidebar'].selected);
+        var sidebarSel = w2ui['sidebar'].selected;
+        switch(sidebarSel){
+            case 'etudiant':
+            case 'enseignant':
+            case 'formation':
+            case 'groupe':
+                console.log("TODO");
+                break;
+            case 'controle':
+                var jours = "";
+                var enumj = $('#enumJours').w2field().get();
+                for (var i =0; i< enumj.length; i++ ){
+                    jours += enumj[i]["text"]+";";
+                }
+                jours = jours.substr(0, jours.length - 1);
+                var dt = {"tempsSaisie": $('#enumTemps').w2field().get(),
+                             "joursSaisie": jours};
+                saveControleData(dt);
+                break;
+                
+        }
+    }
+
+    function reset(){
+        // console.log("reset "+w2ui['sidebar'].selected);
+        var sidebarSel = w2ui['sidebar'].selected;
+        switch(sidebarSel){
+            case 'etudiant':
+            case 'enseignant':
+            case 'formation':
+            case 'groupe':
+                console.log("TODO");
+                break;
+            case 'controle':
+                getControleData();
+                break;
+        }
     }
 
     function disconnect() {
@@ -68,9 +105,8 @@
                 { type: 'bottom', style: pstyle, content: 
                     
                         '<div class="w2ui-buttons">'+
-                        // '<input id="clickMe" type="button" value="clickme" onclick="save();" />'+
-                        '   <button class="w2ui-btn" name="reset">Annuler</button>'+
-                        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+                        '   <button class="w2ui-btn" name="reset" onclick="reset()">Annuler</button>'+
+                        '    <button class="w2ui-btn w2ui-btn-green" name="save" onclick="save()">Enregistrer</button>'+
                         '</div>' }
             ]
     };
@@ -153,48 +189,12 @@
                     getDataGroupeFormation(json);
                 break;
                 case 'controle' :
-                    var nlContent = '<div class="w2ui-field">'+
-                                        '<label>Jours de saisie autorisés :  </label>'+
-                                        '<div> <input id="enumJours"> </div>'+
-                                    '</div>'+
-                                    '<script>'+
-                                    'var jours = [\'dimanche\',\'lundi\',\'mardi\',\'mercredi\',\'jeudi\',\'vendredi\',\'samedi\'];'+
-                                        '$(\'#enumJours\').w2field(\'enum\', { '+
-                                        'items: jours,'+
-                                        'openOnFocus: true,'+
-                                        'selected: [{ id: 0, text: \'lundi\' }]'+
-                                       '});';    
-                //  var jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-                    w2ui['nestedLayout'].content('main',nlContent);
-                // $('#enumJours').w2field('enum', { 
-                //     items: jours,
-                //     openOnFocus: true,
-                //     selected: [{ id: 0, text: 'lundi' }]
-                // });
-                $('#enumJours').w2field().set({ id: 0, text: 'lundi' });
+                    getControleData();
+                    
                 break;
             }
         }
-            // switch (event.target) {
-                
-                // case 'etudiant':
-                //     w2ui['layoutPrincipal'].content('main', 
-                //                 '<div class="w2ui-page page-0">'+
-                //             '	<div id="testChart"></div>'+
-                //             '</div>'+
-                //             '<div class="w2ui-buttons">'+
-                //             '   <button class="w2ui-btn" name="reset">Annuler</button>'+
-                //             '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
-                //             '</div>',
-                //     '<div style="padding: 10px">Etudiant</div>');
-                //     break;
-                // case 'enseignant':
-                //     w2ui['layoutPrincipal'].content('main', '<div style="padding: 10px">Enseignant</div>');
-                //     break;
-                // case 'groupe':
-                //     w2ui['layoutPrincipal'].content('main', '<div style="padding: 10px">Groupe</div>');
-                //     break;
-            // }
+           
     };
 
     var grid ={
@@ -226,35 +226,12 @@
     if (<?php if($this->selection) echo "1"; else echo "0" ?>){
         w2ui['sidebar'].click(<?php echo '\''.$this->selection.'\'';?>);
         w2ui['sidebar'].select(<?php echo '\''.$this->selection.'\'';?>);
-        console.log("clicked sidebar");
+        
     }
 
-
-    // if(w2ui['nestedLayout']) 
-    //             w2ui['nestedLayout'].destroy();
-    //         w2ui['layoutPrincipal'].content('main', $('#nestedLayout').w2layout(nestedLayout));
-    //         w2ui['nestedLayout'].content('bottom',
-    //             '<form enctype="multipart/form-data" action="upload" method="POST">'+
-    //             '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
-    //             'Choose a file to upload:'+
-    //             '<input name="uploadedfile" type="file" />'+
-    //             '<br />'+
-    //             '<input type="submit" value="Upload File" onclick="save();" />'+
-    //             '</form>'
-    //         );
-    //         if ('<?= ($this->resJSON)?true:false; ?>'){
-    //             if (w2ui['grid']){
-    //             w2ui['grid'].destroy();
-    //             } 
-    //             w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));}
-
-
-
     function saveDataToDB(){
-        console.log("will save data to db now !!");
         if (<?php if($this->selection) echo "1"; else echo "0" ?>)
             var dt = {'type':<?php echo '\''.$this->selection.'\'';?>,'resJSON':<?=($this->resJSON)?$this->resJSON:0?>};
-        console.log("dt :"+dt);    
         passJSONviaAjax(dt);
     }
 		
@@ -274,8 +251,77 @@
                     }
                 },            	
                 success: function(result) {
-                    console.log(result);
+                    // console.log(result);
                     w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+            }
+        });
+    }
+
+    function saveControleData(dt){
+        $.ajax({
+                url: "savecontroledata",
+                data: dt,
+                type: 'post',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                        w2alert("Erreur : "+e+"\n dt :"+dt);
+                    }
+                },            	
+                success: function(result) {
+                    // console.log(result);
+                    w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+            }
+        });
+    }
+
+    function getControleData(){
+        $.ajax({
+                url: "getcontroledata",
+                
+                type: 'get',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                        w2alert("Erreur : "+e+"\n requested :"+req);
+                    }
+                },            	
+                success: function(result) {
+                    
+                    var joursSaisie = result["joursSaisie"];
+                    var tempsSaisie = result["tempsSaisie"];
+                    var temp = joursSaisie.split(";");
+                    var selected = "[";
+                    for (var i=0; i<temp.length;i++){
+                    if (i==temp.length-1) 
+                        selected += "{ id :"+i+", text:'"+temp[i]+"'}";
+                    else
+                        selected += "{ id :"+i+", text:'"+temp[i]+"'},";
+                    }
+                    selected += "]";
+                    var nlContent = '<div class="w2ui-field">'+
+                                        '<label>Jours de saisie autorisés :  </label>'+
+                                        '<div> <input id="enumJours"> </div>'+
+                                        '<label>Temps de saisie autorisés :  </label>'+
+                                        '<div> <input id="enumTemps" value="'+tempsSaisie+'"> </div>'+
+                                    '</div>'+
+                                    '<script>'+
+                                    "var jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];"+
+                                    "$('#enumJours').w2field('enum', { "+
+                                    'items: jours,'+
+                                    'openOnFocus: true,'+
+                                    'selected: '+selected+
+                                    '});'+
+                                    "$('#enumTemps').w2field('text');";    
+                    w2ui['nestedLayout'].content('main',nlContent);    
             }
         });
     }
@@ -289,21 +335,18 @@
                 error: function(error){
                     try {
                         var js = JSON.parse(error.responseText);
-                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
-                        // return false;    
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);    
                     } catch (e) {
                         console.log(error.responseText)            		  	
                         w2alert("Erreur : "+e+"\n requested :"+req);
-                        // return false;
                     }
                 },            	
                 success: function(result) {
-                    console.log(result);
-                    // w2alert("Données reçues du serveur");
+                    
                     //load data in grid 
                     var jsonavecrecid =result["rs"];
                     jsonavecrecid = jsonavecrecid.replace(/\"exi_id\":/g, "\"recid\":");
-                    console.log(jsonavecrecid);
+                    // console.log(jsonavecrecid);
                     var grid ={
                         name: 'grid',
                         header: 'Liste des ',
