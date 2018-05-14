@@ -92,21 +92,39 @@ function identifier(){
 
 $(function () {
     var pstyle = 'font-size:16px; border: 1px solid #dfdfdf; padding: 5px;';
+    var textTop = '';
+    if (role.indexOf('admin') !== -1){
+        textTop = '<div class="row">'+
+        '<div class="column left" style="width:75%;">'+
+            '<div id="text" style="float: left; font-size:20px;">'+
+                'Espace Enseignant - Utilisateur : '+user+
+            '</div>'+
+        '</div>'+
+        '<div class="column right" style="width:25%;" >'+
+            '<div class="w2ui-buttons" style="float: right;" >'+
+            '<button class="w2ui-btn w2ui-btn-grey"  name="admin" onclick="administration()">Administration</button> '+
+            '<button class="w2ui-btn w2ui-btn-grey"  name="deconnexion" onclick="disconnect()">Déconnexion</button><br><br>'+
+        '</div>'+
+        '</div>';
+    }
+    else {
+        textTop = '<div class="row">'+
+        '<div class="column left" style="width:75%;">'+
+            '<div id="text" style="float: left; font-size:20px;">'+
+                'Espace Enseignant - Utilisateur : '+user+
+            '</div>'+
+        '</div>'+
+        '<div class="column right" style="width:25%;" >'+
+            '<div class="w2ui-buttons" style="float: right;" >'+
+            '<button class="w2ui-btn w2ui-btn-grey"  name="deconnexion" onclick="disconnect()">Déconnexion</button><br><br>'+
+        '</div>'+
+        '</div>';
+    }
     $('#layout').w2layout({
         name: 'layout',
         panels: [
-            { type: 'top', size: 50, style: 'font-size:16px; border: 1px solid #dfdfdf; padding: 1px;', content: 
-                            '<div class="row">'+
-                            '<div class="column left" style="width:75%;">'+
-                                '<div id="text" style="float: left; font-size:20px;">'+
-                                    'Espace Enseignant - Utilisateur : '+user+
-                                '</div>'+
-                            '</div>'+
-                            '<div class="column right" style="width:25%;" >'+
-                                '<div class="w2ui-buttons" style="float: right;" >'+
-                                '<button class="w2ui-btn w2ui-btn-grey"  name="deconnexion" onclick="disconnect()">Déconnexion</button><br><br>'+
-                            '</div>'+
-                            '</div>' },
+            { type: 'top', size: 50, style: 'font-size:16px; border: 1px solid #dfdfdf; padding: 1px;',
+                     content: textTop },
             { type: 'main', style: pstyle, content: 'main' },
             { type: 'right', size: 300, style: pstyle, 
             content: '<div class="block">'+
@@ -509,4 +527,8 @@ function drawStream(keys,data,update){
 
 function disconnect() {
     window.location.href="../auth/deconnexion";
+}
+
+function administration() {
+    window.location.href="../admin/importcsv";
 }

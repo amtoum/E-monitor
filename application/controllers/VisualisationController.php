@@ -91,6 +91,9 @@ class VisualisationController extends Zend_Controller_Action
                 $infoExi = $this->s->dbE->findByUtiID($utiId);
                 $nomPrenom = $infoExi["nom"]." ".$infoExi["prenom"];
                 $this->view->user =  $this->_getParam('user', $nomPrenom );
+                if ($_SESSION["role"]){
+                    $this->view->role = $this->_getParam('role',$_SESSION["role"]);
+                }
             }
 
             $arrayRes = $this->s->dbR->getEmotions();
