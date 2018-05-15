@@ -350,6 +350,67 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
             return 0;
     }
 
+
+
+    /**
+     * Retourne les émotions en fonction des filtres 
+     * données brutes pour export CSV
+     * 
+     * Exemple de requete
+     * SELECT r.dst_id as id_etudiant,t.code as emotion,r.maj as date,r.niveau as valeur
+     * FROM `flux_rapport` r
+     * INNER JOIN flux_tag t on tag_id = src_id
+     * WHERE DATE(r.maj) between '2018-02-01' and '2018-03-15' 
+     * and src_obj ="tag" and dst_obj = "uti" and pre_obj = "doc"
+     * and dst_id IN 
+     * (SELECT src_id from flux_rapport where pre_id in (84,87))
+     * and src_id in (39,43)
+     *
+     * @param boolean $dateDebut
+     * @param boolean $dateFin
+     * @param integer $idFormation
+     * @return void
+     */
+    public function getEmotionsExport($dateDebut=false, $dateFin=false,$formations='',$emos='')
+    {
+        $query = $this->select()
+                    ->from(array("r"=>"flux_rapport"), 
+                            array("id_etudiant"=>"r.dst_id","emotion"=>"t.code",
+                            "date"=> "r.maj", "valeur" => "r.niveau"))
+                    ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+                    ->joinInner(array('t' => 'flux_tag'),
+                        't.tag_id = r.src_id',array())//,array('tag_id', 'code')
+                    ->where( "r.dst_obj = 'uti'")
+                    ->where( "r.pre_obj = 'doc'")
+                    ->where( "r.src_obj = 'tag'");
+                    //TODO: tester les groupby et orderby
+                    // ->group(array("code","date"))
+                    // ->order(array("code","date"));
+        if ($dateDebut !=false){
+            $query->where("r.maj >= ?",$dateDebut);
+        }
+        if ($dateFin != false){
+            $query->where("r.maj <= ?",$dateFin);
+        }
+        if ($formations != ''){
+            $subquery = $this->select()
+                        ->from(array("r"=>"flux_rapport"), array("src_id"))
+                        ->where("r.pre_id in (?)",$formations)
+                        ->where("r.src_obj = 'etudiant'");
+            // $query->where("f.dst_id IN (SELECT src_id from flux_rapport where pre_id in (?)",$formations);
+            $query->where("r.dst_id IN ($subquery)");
+        }
+        if ($emos != ''){
+            $query->where("r.src_id IN (?)",$emos);
+        }
+        $result = $this->fetchAll($query);//->toArray();
+        if ($result->count()>0)
+            return $result->toArray();
+        else 
+            return 0;
+    }
+
+
     /*
         SELECT r.rapport_id,t.code,r.src_id, r.dst_id,r.maj,r.niveau
         FROM `flux_rapport` r

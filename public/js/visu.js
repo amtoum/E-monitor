@@ -4,8 +4,7 @@ var dtEmo = {"date": "", "emotion":""};
 
 
 function getData() {
-    // console.log("getData");
-    // console.log("selection : "+w2ui['gridFormations'].getSelection());
+    
     var dateDebut = $('input[type=dateDebut]').w2field().get(); 
     var dateFin = $('input[type=dateFin]').w2field().get();
     var formationSel =w2ui['gridFormations'].getSelection();
@@ -45,9 +44,53 @@ function getData() {
     });
 }
 
+
+function getDataExport() {
+    
+    var dateDebut = $('input[type=dateDebut]').w2field().get(); 
+    var dateFin = $('input[type=dateFin]').w2field().get();
+    var formationSel =w2ui['gridFormations'].getSelection();
+    var emos = w2ui['gridEmos'].getSelection();
+    var dt = {"dateDebut": dateDebut, "dateFin":dateFin, "formationSel":formationSel, "emos":emos};
+    $.ajax({
+        url: "exportdatastream",
+        data: dt,
+        type: 'post',
+        dataType: 'json',
+        error: function(error){
+            try {
+                var js = JSON.parse(error.responseText);
+                w2alert("Erreur : "+error.responseText+"\n error :"+error);
+            } catch (e) {
+                console.log(error.responseText)            		  	
+                w2alert("Erreur : "+e+"\n dt :"+dt);
+            }
+        },            	
+        success: function(result) {
+            
+            if(JSON.parse(result["resultJSON"]).length > 1){
+
+                var csv = convertArrayOfObjectsToCSV({
+                    data: JSON.parse(result["resultJSON"])
+                });
+                if (csv == null) return;
+                var pom = document.createElement('a');
+                pom.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+                pom.setAttribute('download', 'export.csv');
+                pom.click();
+               
+            }
+            else {//pas assez d'émotions pour tracer le streamgraph
+                w2alert("La sélection ne retourne pas assez d'émotions à exporter.")
+            }
+        }
+    });
+}
+
+
+
 function identifier(){
-    // console.log("click sur identifier !!");
-    // console.log("dtEmo : date="+dtEmo["date"]+" emotion="+dtEmo["emotion"]);
+
     $.ajax({
         url: "identifieretudiants",
         data: dtEmo,
@@ -63,9 +106,7 @@ function identifier(){
             }
         },            	
         success: function(result) {
-            // w2alert("Données envoyées au serveur et enregistrées avec succès"); 
-            // w2ui['layout2'].content('bottom',"onclick clicked !!! "+dateDebut+" jusqu'à"+dateFin+"\n"+result);
-            // console.log(result);
+           
             if (w2ui['gridEtudiants']){
                 w2ui['gridEtudiants'].destroy();
                 } 
@@ -141,6 +182,7 @@ $(function () {
                         '<div id="gridEmos" style="width: 100%; height: 220px;"></div>'+
                         '<div class="w2ui-buttons">'+
                             '<button class="w2ui-btn" name="valider" onclick="getData()">Valider</button>'+
+                            '<button class="w2ui-btn" name="exporter" onclick="getDataExport()">Exporter</button>'+
                         '</div>'+
                     '</div>'
             }
@@ -531,4 +573,35 @@ function disconnect() {
 
 function administration() {
     window.location.href="../admin/importcsv";
+}
+
+function convertArrayOfObjectsToCSV(args) {
+    var result, ctr, keys, columnDelimiter, lineDelimiter, data;
+
+    data = args.data || null;
+    if (data == null || !data.length) {
+        return null;
+    }
+
+    columnDelimiter = args.columnDelimiter || ',';
+    lineDelimiter = args.lineDelimiter || '\n';
+
+    keys = Object.keys(data[0]);
+
+    result = '';
+    result += keys.join(columnDelimiter);
+    result += lineDelimiter;
+
+    data.forEach(function(item) {
+        ctr = 0;
+        keys.forEach(function(key) {
+            if (ctr > 0) result += columnDelimiter;
+
+            result += item[key];
+            ctr++;
+        });
+        result += lineDelimiter;
+    });
+
+    return result;
 }

@@ -21,6 +21,7 @@
 				cursor: default;
 				text-align: left;
 			}
+            
 					
 		</style>
 	
@@ -152,9 +153,7 @@
             //remplissage du nested layout en fonction de la sidebar
             switch (event.target){
                 case 'etudiant':
-                case 'enseignant':
 
-                    
                         if(<?php if($this->selection) echo '"'.$this->selection.'"'; else echo "{}" ?> == event.target){    
                             if (w2ui['grid']){
                             w2ui['grid'].destroy();
@@ -168,7 +167,103 @@
                         } 
                         else {
                             w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Veuillez '+
-                                                                    'uploader un fichier CSV qui sera utilisé pour remplir la base de données</div>')
+                                                                    'uploader un fichier CSV qui sera utilisé pour remplir la base de données<br><br>'+
+                                                                    "Le contenu doit être suivant l'exemple suivant :<br><br>"+
+                                                                    '<table style="width:100%">'+
+                                                                    '<tr>'+
+                                                                        '<th>nom</th>'+
+                                                                        '<th>prenom</th> '+
+                                                                        '<th>login</th>'+
+                                                                        '<th>groupe</th>'+
+                                                                        '<th>formation</th>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jill</td>'+
+                                                                        '<td>Smith</td>'+
+                                                                        '<td>jsmith01</td>'+
+                                                                        '<td>DUTCOM</td>'+
+                                                                        '<td>DUT COM des organisations</td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jane</td>'+
+                                                                        '<td>Doe</td>'+
+                                                                        '<td>jdoe02</td>'+
+                                                                        '<td>DUTCOM2</td>'+
+                                                                        '<td>DUT COM des organisations 2</td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Martin</td>'+
+                                                                        '<td>Dupont</td>'+
+                                                                        '<td>mdupont</td>'+
+                                                                        '<td>DUTP</td>'+
+                                                                        '<td>DUT Pub</td>'+
+                                                                    '</tr>'+
+                                                                    '</table>'+
+                                                                    
+                                                               ' </div>')
+                            w2ui['nestedLayout'].content('bottom',
+                                '<form enctype="multipart/form-data" action="upload" method="POST">'+
+                                '<input type="hidden" name="selection" value="'+event.target+'"/>'+
+                                '<input type="hidden" name="MAX_FILE_SIZE" value="100000" />'+
+                                'Veuillez choisir le fichier CSV à uploader : '+
+                                '<input class="w2ui-btn w2ui-btn-green" name="uploadedfile" type="file"  pattern="*.csv" required/>'+
+                                '<br />'+
+                                '<input class="w2ui-btn w2ui-btn-green" type="submit" value="Uploader" onclick="save();" />'+
+                                '</form>'
+                            );
+                        }
+                break;
+
+
+                case 'enseignant':
+                        if(<?php if($this->selection) echo '"'.$this->selection.'"'; else echo "{}" ?> == event.target){    
+                            if (w2ui['grid']){
+                            w2ui['grid'].destroy();
+                            } 
+                            w2ui['nestedLayout'].content('main', $('#grid').w2grid(grid));
+                            // $('#grid').w2grid(grid);
+                            if (w2ui['formSaveDB'])
+                                w2ui['formSaveDB'].destroy();
+                            w2ui['nestedLayout'].content('bottom',$().w2form(formSaveDB));
+                    
+                        } 
+                        else {
+                            w2ui['nestedLayout'].content('main','<div id="grid" style="width: 100%; height: 400px; overflow: visible;">Veuillez '+
+                                                                    'uploader un fichier CSV qui sera utilisé pour remplir la base de données<br><br>'+
+                                                                    "Le contenu doit être suivant l'exemple suivant :<br><br>"+
+                                                                    '<table style="width:100%">'+
+                                                                    '<tr>'+
+                                                                        '<th>nom</th>'+
+                                                                        '<th>prenom</th> '+
+                                                                        '<th>login</th>'+
+                                                                        '<th>groupe</th>'+
+                                                                        '<th>formation</th>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jill</td>'+
+                                                                        '<td>Smith</td>'+
+                                                                        '<td>jsmith01</td>'+
+                                                                        '<td>DUTCOM</td>'+
+                                                                        '<td>DUT COM des organisations</td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jill</td>'+
+                                                                        '<td>Smith</td>'+
+                                                                        '<td>jsmith01</td>'+
+                                                                        '<td>DUTP</td>'+
+                                                                        '<td>DUT Pub</td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jane</td>'+
+                                                                        '<td>Doe</td>'+
+                                                                        '<td>jdoe01</td>'+
+                                                                        '<td>DUTCOM</td>'+
+                                                                        '<td>DUT COM des organisations</td>'+
+                                                                    '</tr>'+
+                                                                    '</table>'+
+                                                                    "<br><br>Si un enseignant s'occupe de plusieurs groupes et/ou formations, son nom et prénom seront saisis plusieurs fois."+
+                                                                    "<br>Dans l'exemple ci-dessus, Jill Smith enseigne au DUTCOM et DUTP"+
+                                                               ' </div>')
                             w2ui['nestedLayout'].content('bottom',
                                 '<form enctype="multipart/form-data" action="upload" method="POST">'+
                                 '<input type="hidden" name="selection" value="'+event.target+'"/>'+

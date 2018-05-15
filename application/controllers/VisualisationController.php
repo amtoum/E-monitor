@@ -173,6 +173,85 @@ class VisualisationController extends Zend_Controller_Action
 
     }
 
+
+    /**
+     * Récupère les données brutes pour l'export csv en utilisant les dates de 
+     * début et de fin et autres filtres
+     *
+     * @return void
+     */
+    public function exportdatastreamAction(){
+        $this->initInstance();
+
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbT = new Model_DbTable_Flux_Tag($this->s->db);
+        $this->s->dbD = new Model_DbTable_Flux_Doc($this->s->db);
+        $this->s->dbR = new Model_DbTable_Flux_Rapport($this->s->db);
+        $this->s->dbM = new Model_DbTable_Flux_Monade($this->s->db);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+
+        $dateDebut = $this->_getParam('dateDebut');
+        $dateFin = $this->_getParam('dateFin');
+        // $formations = implode(",",$this->_getParam('formationSel'));
+        $formations = $this->_getParam('formationSel');
+        $emos = $this->_getParam('emos');
+        $resultJSON = $this->s->dbR->getEmotionsExport($dateDebut,$dateFin,$formations,$emos);
+
+        $this->view->resultJSON = json_encode($resultJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // $name = 'export'.time().'.csv';
+        // $filename = getcwd().'/../data/export/'.$name;
+        // // $f = fopen('php://output', 'w');
+        // $f = fopen($filename, 'w');
+        // $firstLineKeys = false;
+        // foreach ($arrayRes as $line)
+        // {
+        //     if (empty($firstLineKeys))
+        //     {
+        //         $firstLineKeys = array_keys($line);
+        //         fputcsv($f, $firstLineKeys);
+        //         $firstLineKeys = array_flip($firstLineKeys);
+        //     }
+        //     // Using array_merge is important to maintain the order of keys acording to the first element
+        //     fputcsv($f, array_merge($firstLineKeys, $line));
+        // }
+
+        
+        // $this->_helper->viewRenderer->setNoRender(true);
+        // header('Content-Description: File Transfer');
+        // header('Content-Type: text/csv; charset=utf-8');
+        // header("Content-Disposition: attachment; filename=" . $filename);
+        // header("Content-Length: " . filesize( $filename ));
+        // header('Content-Transfer-Encoding: binary');
+        // header('Expires: 0');
+        // header('Cache-control: private, must-revalidate');
+        // header("Pragma: public");
+        
+        // fclose($f);
+
+        // $this->_helper->layout->disableLayout();
+        // $this->_helper->viewRenderer->setNoRender();
+        // $this->getResponse()->setRawHeader( "Content-Type: application/csv; charset=UTF-8" )
+        //     ->setRawHeader( "Content-Disposition: attachment; filename=".$filename )
+        //     ->setRawHeader( "Content-Transfer-Encoding: binary" )
+        //     ->setRawHeader( "Expires: 0" )
+        //     ->setRawHeader( "Cache-Control: must-revalidate, post-check=0, pre-check=0" )
+        //     ->setRawHeader( "Pragma: public" )
+        //     ->setRawHeader( "Content-Length: " . filesize( $filename ) )
+        //     ->sendResponse();
+        // readfile( $filename ); exit();
+
+        // $arr = $this->formatEmotions($arrayRes);
+        
+        // $this->view->rs = json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // $this->view->resultJSON = json_encode($arr["arrayRes"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        // $this->view->dateJSON = json_encode($arr["arrayDate"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        // $this->view->emotionsJSON = json_encode($arr["arrayEmotions"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+
+    }
+
     /**
      * récupère les infos sur une date et une émotion donnée et les renvoie à la vue
      * pour afficher dans le grid
