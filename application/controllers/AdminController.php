@@ -133,23 +133,7 @@ class AdminController extends Zend_Controller_Action {
     public function uploadAction()
     {
         $this->initInstance();
-        //php file transfer
-        // $uploaddir = getcwd().'/../data/upload/';
-        // $uploadfile = $uploaddir . basename($_FILES['uploadedfile']['name']);
         
-        // $newName = $this->incrementFileName( $uploaddir, $_FILES["uploadedfile"]["name"] );
-        // // move_uploaded_file($_FILES["my_file"]["tmp_name"],"uploads/".$newName);
-        
-        // // if (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $uploadfile)) {
-        // if (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $newName)) {
-        //     echo "Le fichier est valide, et a été téléchargé
-        //            avec succès. Voici plus d'informations :\n".$newName;
-        // } else {
-        //     echo "Attaque potentielle par téléchargement de fichiers.
-        //           Voici plus d'informations :\n";
-        // }
-        
-        // echo 'Voici quelques informations de débogage :';
         
         //ZEND FILE TRANSFER
         $selection = $_POST['selection'];
@@ -182,33 +166,24 @@ class AdminController extends Zend_Controller_Action {
            echo implode("\n", $messages);
         }
 
-    //jQuery file upload
-        // $this->initInstance();
-        
-        // // if (($stream = fopen('php://delete', "r")) !== FALSE)
-        // //         var_dump(stream_get_contents($stream));
-            
-        //     $auth = Zend_Auth::getInstance();
-        // if ($auth->hasIdentity()) {
-        //     $aFic = new Zend_File_Transfer_Adapter_Http();   		
-        //     // $dbFic = new Model_DbTable_Iste_importfic();						
-        //     //$ssUpload = new Zend_Session_Namespace('upload');
-            
-        //     $path = "/data/upload";//.$ssUpload->typeObj."_".$ssUpload->idObj."/";
-        //     $webPath = "/admin/importcsv";
-        //     $options = array('upload_dir' => ROOT_PATH.$path,'upload_url' => WEB_ROOT.$webPath
-        //         ,'print_response'=>false);
-        //     //$upload_handler = new UploadHandler($options);
-        //     $upload_handler = new CustomUploadHandler($options);
-        //         $response = $upload_handler->get_response();
-        //         $this->view->json = json_encode($response);
-        // } 
+   
                       
         //redirection vers grid 
         $this->_forward('importcsv','Admin','default',array('resJSON' => $json,'selection' => $selection));
-        // sleep(4);
-        // $this->_redirect('admin/importcsv',array('resJSON' => $json));
+       
 
+    }
+
+    public function updategrfrmAction(){
+        $this->initInstance();
+        $this->s = new Flux_Site($this->idBase);
+        $this->s->dbE = new Model_DbTable_Flux_Exi($this->s->db);
+        if($this->_getParam("changes")){
+            $changes = $this->_getParam("changes");
+            foreach ($changes as $element ) {
+                $this->s->dbE->edit($element["recid"], array("mort"=>(($element["mort"] =="") ? null : $element["mort"])));
+            }
+        }
     }
 
     public function savecontroledataAction(){

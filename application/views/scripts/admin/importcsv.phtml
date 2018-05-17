@@ -15,7 +15,8 @@
 	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
 	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
 		<script type="text/javascript" src="../js/jquery.awesome-cursor.min.js" ></script>
-		
+		<!-- moment.js -->
+        <script src="../js/moment.min.js"></script>
 		<style>
 			body {
 				cursor: default;
@@ -59,9 +60,37 @@
         switch(sidebarSel){
             case 'etudiant':
             case 'enseignant':
+                console.log("TODO");
+                break;
             case 'formation':
             case 'groupe':
-                console.log("TODO");
+                var changes = w2ui['grid'].getChanges(); 
+                var finalChanges = [];
+                var pbFormatting = false;
+                console.log(changes);
+                for(var i=0; i<changes.length; i++){
+                    if (moment(changes[i]["mort"], 'YYYY-MM-DD',true).isValid() ){
+                        finalChanges.push(changes[i]);
+                    }
+                    else if (changes[i]["mort"]==""){
+                        finalChanges.push({"recid":changes[i]["recid"],"mort":null});
+                    }
+                    else{
+                        pbFormatting = true;
+                    }
+                }
+                
+                if (finalChanges.length > 0){
+                    
+                    var dt = {"changes": finalChanges};
+                    updateGrFrm(dt);
+                }
+                else if (pbFormatting){
+                    w2alert("Erreur dans le format de date.\nLes dates doivent être sous la forme : AAAA-MM-JJ.");
+                }
+                else {
+                    w2alert("Aucune modification à sauvegarder.")
+                }
                 break;
             case 'controle':
                 var jours = "";
@@ -84,9 +113,12 @@
         switch(sidebarSel){
             case 'etudiant':
             case 'enseignant':
+                console.log("TODO");
+                break;
             case 'formation':
             case 'groupe':
                 console.log("TODO");
+                w2ui["sidebar"].click(sidebarSel);
                 break;
             case 'controle':
                 getControleData();
@@ -352,6 +384,28 @@
         });
     }
 
+    function updateGrFrm(dt){
+        $.ajax({
+                url: "updategrfrm",
+                data: dt,
+                type: 'post',
+                dataType: 'json',
+                error: function(error){
+                    try {
+                        var js = JSON.parse(error.responseText);
+                        w2alert("Erreur : "+error.responseText+"\n error :"+error);
+                    } catch (e) {
+                        console.log(error.responseText)            		  	
+                        w2alert("Erreur : "+e+"\n dt :"+dt);
+                    }
+                },            	
+                success: function(result) {
+                    // console.log(result);
+                    w2alert("Données envoyées au serveur et enregistrées avec succès"); 
+            }
+        });
+    }
+
     function saveControleData(dt){
         $.ajax({
                 url: "savecontroledata",
@@ -457,7 +511,7 @@
                         }, 
                         columns: [
                             { field: 'nom', caption: 'Libellé', size: '30%'},
-                            { field: 'nait', caption: 'Date début', size: '30%'},
+                            { field: 'nait', caption: 'Date Début', size: '30%'},
                             { field: 'mort', caption: 'Date Fin', size: '30%',editable: {type: 'text'}},
                         ],
                         // records : jsonavecrecid,
