@@ -42,7 +42,13 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 		if(isset($data['nom']))$select->where('nom = ?', $data['nom']);
 		if(isset($data['prenom']))$select->where('prenom = ?', $data['prenom']);
 		if(isset($data['isni']))$select->where('isni = ?', $data['isni']);
-		if(isset($data['url']))$select->where('url = ?', $data['url']);
+        if(isset($data['url']))$select->where('url = ?', $data['url']);
+        if(isset($data['mort'])){
+            if ($data['mort'] == "null")
+                $select->where('mort is NULL');
+            else
+                $select->where('mort = ?', $data['mort']);
+        }
 		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->exi_id; else $id=false;
         return $id;
@@ -63,7 +69,8 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 	    	if($existe)$id = $this->existe($data);	    		
 	    	if(!$id){
 	    		$data = $this->updateHierarchie($data);
-	    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
+                if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
+                if ($data['mort'] == "null") $data['mort']=null;
 	    	 	$id = $this->insert($data);
 	    	}
 	    	if($rs)
@@ -412,7 +419,10 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     
     /**
      * Récupère les formations de l'année
-     *      SELECT exi_id, nom FROM `flux_exi` WHERE data = 'formation' and nait = '2017-09-01'
+     *      SELECT DISTINCT e.exi_id, e.nom 
+     *      FROM `flux_exi` e
+     *      Inner join flux_rapport r on r.pre_id= e.exi_id
+     *      WHERE e.data = 'formation' and r.valeur = '2017-09-01' and e.mort is NULL
      * @param Datetime $date ('Y-m-d')
      * 
      * @return array
@@ -420,9 +430,13 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function getFormationsAnnee($date){
         // $subquery = $this->
         $query = $this->select()
+                    ->distinct()
                     ->from( array("e" => "flux_exi"), array('recid'=>'exi_id','nom') )  
+                    ->joinInner(array('r' => 'flux_rapport'),
+                        'e.exi_id = r.pre_id',array()) 
                     ->where('e.data = "formation"')
-                    ->where( "e.nait = ? ", $date );
+                    ->where( "r.valeur = ? ", $date )
+                    ->where("e.mort is NULL");
         $result = $this->fetchAll($query);        
         return $result->toArray();
     }

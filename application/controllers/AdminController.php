@@ -227,9 +227,9 @@ class AdminController extends Zend_Controller_Action {
                     
                     $idEtudiantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "etudiant"));
                     $idEtudiantExi = $this->s->dbE->ajouter(array("uti_id" => $idEtudiantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
-                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait ,"mort"=>"null")) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
-                    "nait" => $nait, "niveau" => $idFormationExi)) ;
+                    "nait" => $nait, "niveau" => $idFormationExi,"mort"=>"null")) ;
                     $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
                     "src_id"=>$idEtudiantUti, "src_obj"=>"etudiant",
                         "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
@@ -249,9 +249,9 @@ class AdminController extends Zend_Controller_Action {
                     
                     $idEnseignantUti = $this->s->dbU->ajouter(array("login" => $ligne["login"], "role" => "enseignant"));
                     $idEnseignantExi = $this->s->dbE->ajouter(array("uti_id" => $idEnseignantUti, "nom" => $ligne["nom"], "prenom" => $ligne["prenom"] )) ;
-                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait )) ;
+                    $idFormationExi = $this->s->dbE->ajouter(array("nom" => $ligne["formation"], "data" => "formation", "nait" => $nait ,"mort"=>"null")) ;
                     $idGroupeExi = $this->s->dbE->ajouter(array("nom" => $ligne["groupe"], "data" => "groupe",
-                    "nait" => $nait, "niveau" => $idFormationExi)) ;
+                    "nait" => $nait, "niveau" => $idFormationExi,"mort"=>"null")) ;
                     $idRappEtuGr = $this->s->dbR->ajouter(array("monade_id"=> $this->idMonade, 
                     "src_id"=>$idEnseignantExi, "src_obj"=>"enseignant",
                         "dst_id"=>$idGroupeExi, "dst_obj"=>"groupe",
