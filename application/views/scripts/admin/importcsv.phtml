@@ -231,6 +231,8 @@
                                                                         '<td>DUT Pub</td>'+
                                                                     '</tr>'+
                                                                     '</table>'+
+                                                                    "<br><br> Le fichier csv ne doit pas contenir plus de 150 lignes."+
+                                                                    "<br>Si les données à importer dépassent cette limite, elles devront être réparties dans plusieurs fichiers csv (avec entêtes)."+
                                                                     
                                                                ' </div>')
                             w2ui['nestedLayout'].content('bottom',
@@ -275,7 +277,14 @@
                                                                         '<td>Jill</td>'+
                                                                         '<td>Smith</td>'+
                                                                         '<td>jsmith01</td>'+
-                                                                        '<td>DUTCOM</td>'+
+                                                                        '<td>DUTCOM-groupe1</td>'+
+                                                                        '<td>DUT COM des organisations</td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td>Jill</td>'+
+                                                                        '<td>Smith</td>'+
+                                                                        '<td>jsmith01</td>'+
+                                                                        '<td>DUTCOM-groupe2</td>'+
                                                                         '<td>DUT COM des organisations</td>'+
                                                                     '</tr>'+
                                                                     '<tr>'+
@@ -293,8 +302,11 @@
                                                                         '<td>DUT COM des organisations</td>'+
                                                                     '</tr>'+
                                                                     '</table>'+
-                                                                    "<br><br>Si un enseignant s'occupe de plusieurs groupes et/ou formations, son nom et prénom seront saisis plusieurs fois."+
-                                                                    "<br>Dans l'exemple ci-dessus, Jill Smith enseigne au DUTCOM et DUTP"+
+                                                                    "<br><br> Le fichier csv ne doit pas contenir plus de 150 lignes."+
+                                                                    "<br>Si les données à importer dépassent cette limite, elles devront être réparties dans plusieurs fichiers csv (avec entêtes)."+
+                                                                    "<br><br>Si un enseignant s'occupe de plusieurs groupes et/ou formations, son nom et prénom seront saisis plusieurs fois, accompagnés des informations sur ses groupes et/ou formations."+
+                                                                    "<br>Dans l'exemple ci-dessus, Jill Smith enseigne à 2 formations différentes (DUT COM et DUT PUB)."+
+                                                                    "<br>Il enseigne aussi à 2 groupes différents au sein du DUT COM."+
                                                                ' </div>')
                             w2ui['nestedLayout'].content('bottom',
                                 '<form enctype="multipart/form-data" action="upload" method="POST">'+
